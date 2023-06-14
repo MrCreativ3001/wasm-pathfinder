@@ -1,5 +1,4 @@
 use crate::pathfinders::{Grid, Pos, Tile, Unit};
-use crate::ui::grid::_TileProps::{is_end, is_start};
 use std::ops::{BitAnd, Range};
 use yew::{
     classes, function_component, html, Callback, Classes, DragEvent, Html, MouseEvent, Properties,
@@ -8,6 +7,8 @@ use yew::{
 #[derive(Properties, PartialEq)]
 pub struct GridProps {
     pub grid: Grid,
+    #[prop_or_default]
+    pub path: Vec<Pos>,
     #[prop_or_default]
     pub on_tile_click: Callback<Pos>,
 }
@@ -25,8 +26,9 @@ pub fn GridComponent(props: &GridProps) -> Html {
                     html_list(0..grid.columns(), classes!("row"), |y| {
                         let pos = Pos { x, y };
                         let tile = grid.tile(pos);
-                    let is_tile_start= pos == start;
-                    let is_tile_end = pos == end;
+                        let is_tile_start= pos == start;
+                        let is_tile_end = pos == end;
+                        let is_tile_path = props.path.contains(&pos);
 
                         let on_tile_click = {
                             let on_tile_click = props.on_tile_click.clone();
@@ -35,7 +37,7 @@ pub fn GridComponent(props: &GridProps) -> Html {
                             })
                         };
 
-                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} on_tile_click={on_tile_click} />)
+                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} is_path={is_tile_path} on_tile_click={on_tile_click} />)
                     })
                 })
         }
@@ -59,16 +61,18 @@ struct TileProps {
     pub tile: Tile,
     pub is_start: bool,
     pub is_end: bool,
+    pub is_path: bool,
     pub on_tile_click: Callback<()>,
 }
 #[function_component]
 fn TileComponent(props: &TileProps) -> Html {
     let tile = &props.tile;
-    let class = match (tile, props.is_start, props.is_end) {
-        (_, true, _) => "tile-start",
-        (_, _, true) => "tile-end",
-        (Tile::None, _, _) => "tile-none",
-        (Tile::Wall, _, _) => "tile-wall",
+    let class = match (tile, props.is_start, props.is_end, props.is_path) {
+        (_, true, _, _) => "tile-start",
+        (_, _, true, _) => "tile-end",
+        (Tile::Wall, _, _, _) => "tile-wall",
+        (_, _, _, true) => "tile-path",
+        (Tile::None, _, _, _) => "tile-none",
     };
 
     let on_mouse_check = {
