@@ -1,0 +1,6 @@
+# Intellij
+.idea
+
+# Rust / Cargo / Trunk
+target
+dist

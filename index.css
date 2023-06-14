@@ -1,0 +1,27 @@
+.rows {
+    display: flex;
+    flex-direction: row;
+}
+.row {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tiles */
+.tile {
+    width: 100px;
+    height: 100px;
+    border: 1px solid black;
+}
+.tile-none {
+    background-color: #34ceff;
+}
+.tile-wall {
+    background-color: #000000;
+}
+.tile-start {
+    background-color: #00ff00;
+}
+.tile-end {
+    background-color: #ff0000;
+}
