@@ -119,7 +119,7 @@ impl Grid {
         *self.tiles.get(pos).expect("invalid position")
     }
     pub fn tile_opt(&self, pos: Pos) -> Option<Tile> {
-        self.tiles.get(pos).map(|tile| *tile)
+        self.tiles.get(pos).copied()
     }
     pub fn set_tile(&mut self, pos: Pos, tile: Tile) {
         if self.start == pos || self.end == pos {
@@ -145,7 +145,7 @@ impl Grid {
     }
 }
 
-// description of pathfinding algorithms https://happycoding.io/tutorials/libgdx/pathfinding#a
+// description of pathfinding algorithms https://happycoding.io/tutorials/libgdx/pathfinding
 pub mod astar;
 pub mod breadth_first;
 
@@ -161,6 +161,12 @@ impl PathFinders {
             Self::BreadthFirst => breadth_first::BreadthFirst::find_path(grid),
             Self::AStar => astar::AStar::find_path(grid),
         }
+    }
+}
+
+impl Default for PathFinders {
+    fn default() -> Self {
+        Self::BreadthFirst
     }
 }
 
