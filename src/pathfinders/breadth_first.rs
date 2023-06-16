@@ -7,7 +7,7 @@ pub type BreadthFirst = BestFirst<BreadthFirstPrioritizer>;
 pub struct BreadthFirstPrioritizer;
 
 impl PosPrioritizer for BreadthFirstPrioritizer {
-    fn new_prioritizer(grid: &Grid) -> Self {
+    fn new_prioritizer(_grid: &Grid) -> Self {
         Self
     }
 
