@@ -47,6 +47,7 @@ pub fn Options(props: &OptionsProps) -> Html {
             <select onchange={selection_on_change}>
                 {create_option(PathFindAlgorithms::BreadthFirst, selected_path_finder, "Breadth first")}
                 {create_option(PathFindAlgorithms::Dijkstra, selected_path_finder, "Dijkstra")}
+                {create_option(PathFindAlgorithms::AStar, selected_path_finder, "A*")}
             </select>
             <button onclick={on_click_find_path}>{"Start Search"}</button>
         </div>
@@ -70,6 +71,7 @@ fn path_finder_str(path_finder: PathFindAlgorithms) -> &'static str {
     match path_finder {
         PathFindAlgorithms::BreadthFirst => "breadth_first",
         PathFindAlgorithms::Dijkstra => "dijkstra",
+        PathFindAlgorithms::AStar => "a_star",
     }
 }
 
@@ -77,6 +79,7 @@ fn path_finder_from_str(str: &str) -> Option<PathFindAlgorithms> {
     match str {
         "breadth_first" => Some(PathFindAlgorithms::BreadthFirst),
         "dijkstra" => Some(PathFindAlgorithms::Dijkstra),
+        "a_star" => Some(PathFindAlgorithms::AStar),
         _ => None,
     }
 }
