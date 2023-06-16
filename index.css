@@ -25,6 +25,9 @@
 .tile-end {
     background-color: #ff0000;
 }
+.tile-visited {
+    background-color: #ff00ff;
+}
 .tile-path {
     background-color: #ffff00;
 }

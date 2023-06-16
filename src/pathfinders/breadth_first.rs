@@ -1,51 +1,82 @@
-use crate::pathfinders::{Grid, PathFinder, Pos, Tile, Vec2d};
+use crate::pathfinders::PathFindAlgorithmStepResult::{InProgress, NotFound};
+use crate::pathfinders::{
+    Grid, PathFindAlgorithm, PathFindAlgorithmConstructor, PathFindAlgorithmStepResult, Pos, Tile,
+    Vec2d,
+};
 use std::collections::VecDeque;
 
-pub struct BreadthFirst {}
+#[derive(Clone, Debug)]
+pub struct BreadthFirst {
+    grid: Grid,
+    queue: VecDeque<Pos>,
+    backtrace: Vec2d<Option<Pos>>,
+}
 
-impl PathFinder for BreadthFirst {
-    fn find_path(grid: &Grid) -> Option<Vec<Pos>> {
-        let mut queue = VecDeque::new();
-        let mut backtrace: Vec2d<Option<Pos>> =
-            Vec2d::new(grid.rows() as usize, grid.columns() as usize, None);
+impl BreadthFirst {
+    fn init(&mut self) {
+        self.queue.push_front(self.grid.start());
+    }
+}
 
-        queue.push_front(grid.start());
+impl PathFindAlgorithmConstructor for BreadthFirst {
+    fn make_state(grid: Grid) -> Self {
+        let mut state = Self {
+            backtrace: Vec2d::new(grid.rows() as usize, grid.columns() as usize, None),
+            queue: VecDeque::new(),
+            grid,
+        };
+        state.init();
+        state
+    }
+}
+impl PathFindAlgorithm for BreadthFirst {
+    fn next_step(&mut self) -> Result<Vec<Pos>, PathFindAlgorithmStepResult> {
+        const DIRECTIONS: [Pos; 4] = [Pos::UP, Pos::DOWN, Pos::LEFT, Pos::RIGHT];
 
-        while let Some(pos) = queue.pop_back() {
-            if pos == grid.end() {
-                break;
+        // if the queue is empty, no more tiles to search exist
+        let pos = self.queue.pop_back().ok_or(NotFound)?;
+
+        // if the tile is the end, try to find the path
+        if pos == self.grid.end() {
+            // backtrace
+            let mut path = Vec::new();
+            let mut pos = pos;
+            while pos != self.grid.start() {
+                path.push(pos);
+                // If no backtrace, no path was found
+                pos = self.backtrace.get(pos).ok_or(NotFound)?.ok_or(NotFound)?;
             }
-
-            const DIRECTIONS: [Pos; 4] = [Pos::UP, Pos::DOWN, Pos::LEFT, Pos::RIGHT];
-
-            let neighbors = DIRECTIONS
-                .iter()
-                .map(|dir| pos + *dir)
-                .filter(|&pos| grid.tile_opt(pos) == Some(Tile::None));
-
-            for neighbor in neighbors {
-                // if backtrace[neighbor] doesn't exist
-                if let Some(None) = backtrace.get(neighbor) {
-                    backtrace.set(neighbor, Some(pos));
-                    queue.push_front(neighbor);
-                }
-            }
-        }
-
-        // backtrace
-        let mut path = vec![];
-
-        let mut pos = grid.end();
-        while pos != grid.start() {
             path.push(pos);
-            pos = match backtrace.get(pos) {
-                Some(Some(pos)) => *pos,
-                _ => return None,
-            }
+            path.reverse();
+            return Ok(path);
         }
 
-        path.reverse();
+        let neighbors = DIRECTIONS
+            .iter()
+            .map(|dir| pos + *dir)
+            .filter(|pos| !self.visited(*pos))
+            .filter(|pos| matches!(self.grid.tile_opt(*pos), Some(Tile::None)))
+            .collect::<Vec<_>>();
 
-        Some(path)
+        for neighbor in neighbors {
+            if matches!(self.backtrace.get(neighbor), Some(Some(_))) {
+                continue;
+            }
+            self.queue.push_front(neighbor);
+            self.backtrace.set(neighbor, Some(pos));
+        }
+
+        Err(InProgress)
+    }
+
+    fn visited(&self, pos: Pos) -> bool {
+        match self.backtrace.get(pos) {
+            Some(Some(_)) => true,
+            _ => false,
+        }
+    }
+
+    fn in_queue(&self, pos: Pos) -> bool {
+        self.queue.contains(&pos)
     }
 }

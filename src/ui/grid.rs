@@ -9,6 +9,8 @@ pub struct GridProps {
     pub grid: Grid,
     #[prop_or_default]
     pub path: Vec<Pos>,
+    #[prop_or(Callback::from(|_| false))]
+    pub visited: Callback<Pos, bool>,
     #[prop_or_default]
     pub on_tile_click: Callback<Pos>,
 }
@@ -36,8 +38,9 @@ pub fn GridComponent(props: &GridProps) -> Html {
                                 on_tile_click.emit(pos)
                             })
                         };
+                        let is_visited = props.visited.emit(pos);
 
-                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} is_path={is_tile_path} on_tile_click={on_tile_click} />)
+                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} is_path={is_tile_path} is_visited={is_visited} on_tile_click={on_tile_click} />)
                     })
                 })
         }
@@ -62,17 +65,25 @@ struct TileProps {
     pub is_start: bool,
     pub is_end: bool,
     pub is_path: bool,
+    pub is_visited: bool,
     pub on_tile_click: Callback<()>,
 }
 #[function_component]
 fn TileComponent(props: &TileProps) -> Html {
     let tile = &props.tile;
-    let class = match (tile, props.is_start, props.is_end, props.is_path) {
-        (_, true, _, _) => "tile-start",
-        (_, _, true, _) => "tile-end",
-        (Tile::Wall, _, _, _) => "tile-wall",
-        (_, _, _, true) => "tile-path",
-        (Tile::None, _, _, _) => "tile-none",
+    let class = match (
+        tile,
+        props.is_start,
+        props.is_end,
+        props.is_path,
+        props.is_visited,
+    ) {
+        (_, true, _, _, _) => "tile-start",
+        (_, _, true, _, _) => "tile-end",
+        (Tile::Wall, _, _, _, _) => "tile-wall",
+        (_, _, _, _, true) => "tile-visited",
+        (_, _, _, true, _) => "tile-path",
+        (Tile::None, _, _, _, _) => "tile-none",
     };
 
     let on_mouse_check = {

@@ -767,6 +767,7 @@ dependencies = [
 name = "wasm-path-finder"
 version = "0.1.0"
 dependencies = [
+ "gloo",
  "log",
  "wasm-bindgen",
  "wasm-logger",

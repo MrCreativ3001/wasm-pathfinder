@@ -1,4 +1,6 @@
-use std::ops::Add;
+use crate::pathfinders::breadth_first::BreadthFirst;
+use std::fmt::Debug;
+use std::ops::{Add, DerefMut};
 
 pub type Unit = i32;
 
@@ -88,6 +90,15 @@ impl<T> Vec2d<T> {
     }
 }
 
+impl<T> Vec2d<T>
+where
+    T: PartialEq,
+{
+    pub fn contains(&self, value: T) -> bool {
+        self.flattened.contains(&value)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Grid {
     rows: Unit,
@@ -146,30 +157,32 @@ impl Grid {
 }
 
 // description of pathfinding algorithms https://happycoding.io/tutorials/libgdx/pathfinding
-pub mod astar;
 pub mod breadth_first;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub enum PathFinders {
+pub enum PathFindAlgorithms {
     BreadthFirst,
-    AStar,
 }
-
-impl PathFinders {
-    pub fn find_path(&self, grid: &Grid) -> Option<Vec<Pos>> {
+impl PathFindAlgorithms {
+    pub fn make_state(&self, grid: Grid) -> Box<dyn PathFindAlgorithm> {
         match self {
-            Self::BreadthFirst => breadth_first::BreadthFirst::find_path(grid),
-            Self::AStar => astar::AStar::find_path(grid),
+            Self::BreadthFirst => Box::new(BreadthFirst::make_state(grid)),
         }
     }
 }
 
-impl Default for PathFinders {
-    fn default() -> Self {
-        Self::BreadthFirst
-    }
+pub trait PathFindAlgorithmConstructor {
+    fn make_state(grid: Grid) -> Self;
+}
+pub trait PathFindAlgorithm {
+    fn next_step(&mut self) -> Result<Vec<Pos>, PathFindAlgorithmStepResult>;
+
+    fn visited(&self, pos: Pos) -> bool;
+    fn in_queue(&self, pos: Pos) -> bool;
 }
 
-pub trait PathFinder {
-    fn find_path(grid: &Grid) -> Option<Vec<Pos>>;
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum PathFindAlgorithmStepResult {
+    InProgress,
+    NotFound,
 }

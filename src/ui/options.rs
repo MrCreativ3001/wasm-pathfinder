@@ -1,20 +1,16 @@
-use crate::pathfinders::PathFinders;
-use std::mem::swap;
+use crate::pathfinders::PathFindAlgorithms;
 use std::ops::{Deref, DerefMut};
-use std::path::Path;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlSelectElement;
-use yew::html::IntoPropValue;
 use yew::{
-    classes, function_component, html, use_mut_ref, Callback, Event, Html, InputEvent, Properties,
-    TargetCast,
+    classes, function_component, html, use_mut_ref, Callback, Event, Html, Properties, TargetCast,
 };
 
 #[derive(Properties, PartialEq)]
 pub struct OptionsProps {
-    #[prop_or(PathFinders::BreadthFirst)]
-    pub default_path_finder: PathFinders,
-    pub on_find_path: Callback<PathFinders>,
+    #[prop_or(PathFindAlgorithms::BreadthFirst)]
+    pub default_path_finder: PathFindAlgorithms,
+    pub on_find_path: Callback<PathFindAlgorithms>,
 }
 
 #[function_component]
@@ -51,15 +47,18 @@ pub fn Options(props: &OptionsProps) -> Html {
     html! {
         <div class={classes!("options")}>
             <select onchange={selection_on_change}>
-                {create_option(PathFinders::BreadthFirst, selected_path_finder, "Breadth first")}
-                {create_option(PathFinders::AStar, selected_path_finder, "A*")}
+                {create_option(PathFindAlgorithms::BreadthFirst, selected_path_finder, "Breadth first")}
             </select>
-            <button onclick={on_click_find_path}>{"Find path"}</button>
+            <button onclick={on_click_find_path}>{"Start Search"}</button>
         </div>
     }
 }
 
-fn create_option(path_finder: PathFinders, selected_path_finder: PathFinders, name: &str) -> Html {
+fn create_option(
+    path_finder: PathFindAlgorithms,
+    selected_path_finder: PathFindAlgorithms,
+    name: &str,
+) -> Html {
     let path_finder_str = path_finder_str(path_finder);
     let selected = path_finder == selected_path_finder;
 
@@ -68,17 +67,15 @@ fn create_option(path_finder: PathFinders, selected_path_finder: PathFinders, na
     }
 }
 
-fn path_finder_str(path_finder: PathFinders) -> &'static str {
+fn path_finder_str(path_finder: PathFindAlgorithms) -> &'static str {
     match path_finder {
-        PathFinders::BreadthFirst => "breadth_first",
-        PathFinders::AStar => "astar",
+        PathFindAlgorithms::BreadthFirst => "breadth_first",
     }
 }
 
-fn path_finder_from_str(str: &str) -> Option<PathFinders> {
+fn path_finder_from_str(str: &str) -> Option<PathFindAlgorithms> {
     match str {
-        "breadth_first" => Some(PathFinders::BreadthFirst),
-        "astar" => Some(PathFinders::AStar),
+        "breadth_first" => Some(PathFindAlgorithms::BreadthFirst),
         _ => None,
     }
 }
