@@ -1,7 +1,7 @@
 use crate::pathfinders::{Grid, PathFindAlgorithm, PathFindAlgorithms, Pos, Tile};
 use crate::ui::options::Options;
 use gloo::timers::callback::Interval;
-use std::ops::{Deref, DerefMut};
+use std::ops::{Deref};
 use ui::grid::GridComponent;
 use yew::prelude::*;
 

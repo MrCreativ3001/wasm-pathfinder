@@ -1,9 +1,9 @@
 use crate::pathfinders::PathFindAlgorithms;
-use std::ops::{Deref, DerefMut};
+use std::ops::{Deref};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlSelectElement;
 use yew::{
-    classes, function_component, html, use_mut_ref, Callback, Event, Html, Properties, TargetCast,
+    classes, function_component, html, use_mut_ref, Callback, Event, Html, Properties,
 };
 
 #[derive(Properties, PartialEq)]

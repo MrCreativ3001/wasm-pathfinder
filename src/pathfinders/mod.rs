@@ -1,6 +1,6 @@
 use crate::pathfinders::breadth_first::BreadthFirst;
 use std::fmt::Debug;
-use std::ops::{Add, DerefMut};
+use std::ops::{Add};
 
 pub type Unit = i32;
 
