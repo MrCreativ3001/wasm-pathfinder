@@ -1,10 +1,8 @@
 use crate::pathfinders::PathFindAlgorithms;
-use std::ops::{Deref};
+use std::ops::Deref;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlSelectElement;
-use yew::{
-    classes, function_component, html, use_mut_ref, Callback, Event, Html, Properties,
-};
+use yew::{classes, function_component, html, use_mut_ref, Callback, Event, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct OptionsProps {
@@ -48,6 +46,7 @@ pub fn Options(props: &OptionsProps) -> Html {
         <div class={classes!("options")}>
             <select onchange={selection_on_change}>
                 {create_option(PathFindAlgorithms::BreadthFirst, selected_path_finder, "Breadth first")}
+                {create_option(PathFindAlgorithms::Dijkstra, selected_path_finder, "Dijkstra")}
             </select>
             <button onclick={on_click_find_path}>{"Start Search"}</button>
         </div>
@@ -70,12 +69,14 @@ fn create_option(
 fn path_finder_str(path_finder: PathFindAlgorithms) -> &'static str {
     match path_finder {
         PathFindAlgorithms::BreadthFirst => "breadth_first",
+        PathFindAlgorithms::Dijkstra => "dijkstra",
     }
 }
 
 fn path_finder_from_str(str: &str) -> Option<PathFindAlgorithms> {
     match str {
         "breadth_first" => Some(PathFindAlgorithms::BreadthFirst),
+        "dijkstra" => Some(PathFindAlgorithms::Dijkstra),
         _ => None,
     }
 }

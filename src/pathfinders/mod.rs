@@ -1,6 +1,6 @@
 use crate::pathfinders::breadth_first::BreadthFirst;
 use std::fmt::Debug;
-use std::ops::{Add};
+use std::ops::Add;
 
 pub type Unit = i32;
 
@@ -157,16 +157,20 @@ impl Grid {
 }
 
 // description of pathfinding algorithms https://happycoding.io/tutorials/libgdx/pathfinding
+pub mod best_first;
 pub mod breadth_first;
+pub mod dijkstra;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum PathFindAlgorithms {
     BreadthFirst,
+    Dijkstra,
 }
 impl PathFindAlgorithms {
     pub fn make_state(&self, grid: Grid) -> Box<dyn PathFindAlgorithm> {
         match self {
             Self::BreadthFirst => Box::new(BreadthFirst::make_state(grid)),
+            Self::Dijkstra => Box::new(dijkstra::Dijkstra::make_state(grid)),
         }
     }
 }
