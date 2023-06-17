@@ -53,7 +53,7 @@ pub fn GridComponent(props: &GridProps) -> Html {
                             let on_end_move = props.on_end_move.clone();
                             let drag_state = drag_state.clone();
 
-                            Callback::from(move |_| {
+                            Callback::from(move |e| {
                                 if is_tile_start {
                                     drag_state.replace_with(|_| DragState::Start);
                                 } else if is_tile_end {
@@ -133,21 +133,27 @@ fn TileComponent(props: &TileProps) -> Html {
         (Tile::None, _, _, _, _) => "tile-none",
     };
 
+    const LEFT_MOUSE_BUTTON_BITMASK: u16 = 1;
     let on_mouse_down = {
         let on_tile_click = props.on_tile_click.clone();
 
         Callback::from(move |e: MouseEvent| {
-            on_tile_click.emit(());
+            let mouse_down = e.buttons().bitand(LEFT_MOUSE_BUTTON_BITMASK) != 0;
+
+            if mouse_down {
+                on_tile_click.emit(());
+            }
         })
     };
     let on_mouse_enter = {
         let on_tile_mouse_enter = props.on_tile_mouse_enter.clone();
 
         Callback::from(move |e: MouseEvent| {
-            const LEFT_MOUSE_BUTTON_BITMASK: u16 = 1;
             let mouse_down = e.buttons().bitand(LEFT_MOUSE_BUTTON_BITMASK) != 0;
 
-            on_tile_mouse_enter.emit(mouse_down)
+            if mouse_down {
+                on_tile_mouse_enter.emit(mouse_down)
+            }
         })
     };
 

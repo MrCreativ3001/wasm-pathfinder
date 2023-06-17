@@ -1,3 +1,24 @@
+body {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+/* Options */
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.options-grid-header {
+    margin-bottom: 0;
+}
+.options-grid {
+    margin-left: 10px;
+}
+
+/* Grid */
 .rows {
     display: flex;
     flex-direction: row;

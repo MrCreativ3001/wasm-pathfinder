@@ -135,8 +135,20 @@ pub fn Options(props: &OptionsProps) -> Html {
                 {create_option(PathFindAlgorithms::AStar, selected_path_finder, "A*")}
             </select>
             <button onclick={on_click_find_path}>{"Start Search"}</button>
-            <input type="number" min="1" max="100" value={grid_options.rows.to_string()} onchange={on_rows_change} />
-            <input type="number" min="1" max="100" value={grid_options.columns.to_string()} onchange={on_columns_change} />
+
+            <div>
+                <h3 class={classes!("options-grid-header")}>{"Grid Options"}</h3>
+                <div class={classes!("options-grid")}>
+                    <div>
+                        <label>{"Rows: "}</label>
+                        <input type="range" min="1" max="100" value={grid_options.rows.to_string()} onchange={on_rows_change} />
+                    </div>
+                    <div>
+                        <label>{"Columns: "}</label>
+                        <input type="range" min="1" max="100" value={grid_options.columns.to_string()} onchange={on_columns_change} />
+                    </div>
+                </div>
+            </div>
         </div>
     }
 }

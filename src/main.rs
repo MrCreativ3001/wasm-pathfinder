@@ -137,10 +137,10 @@ fn App() -> Html {
     };
 
     html!(
-        <div>
+        <>
           <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} />
           <GridComponent grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
-        </div>
+        </>
     )
 }
 
