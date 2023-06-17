@@ -157,14 +157,16 @@ impl Grid {
 }
 
 // description of pathfinding algorithms https://happycoding.io/tutorials/libgdx/pathfinding
-mod astar;
+pub mod astar;
 pub mod best_first;
 pub mod breadth_first;
+pub mod depth_first;
 pub mod dijkstra;
 pub mod distance;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum PathFindAlgorithms {
+    DepthFirst,
     BreadthFirst,
     Dijkstra,
     AStar,
@@ -172,6 +174,7 @@ pub enum PathFindAlgorithms {
 impl PathFindAlgorithms {
     pub fn make_state(&self, grid: Grid) -> Box<dyn PathFindAlgorithm> {
         match self {
+            Self::DepthFirst => Box::new(depth_first::DepthFirst::make_state(grid)),
             Self::BreadthFirst => Box::new(BreadthFirst::make_state(grid)),
             Self::Dijkstra => Box::new(dijkstra::Dijkstra::make_state(grid)),
             Self::AStar => Box::new(astar::AStar::make_state(grid)),
