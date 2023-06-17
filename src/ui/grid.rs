@@ -151,9 +151,7 @@ fn TileComponent(props: &TileProps) -> Html {
         Callback::from(move |e: MouseEvent| {
             let mouse_down = e.buttons().bitand(LEFT_MOUSE_BUTTON_BITMASK) != 0;
 
-            if mouse_down {
-                on_tile_mouse_enter.emit(mouse_down)
-            }
+            on_tile_mouse_enter.emit(mouse_down)
         })
     };
 
