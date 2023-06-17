@@ -157,7 +157,7 @@ impl Grid {
 }
 
 // description of pathfinding algorithms https://happycoding.io/tutorials/libgdx/pathfinding
-pub mod astar;
+pub mod a_star;
 pub mod best_first;
 pub mod breadth_first;
 pub mod depth_first;
@@ -177,7 +177,7 @@ impl PathFindAlgorithms {
             Self::DepthFirst => Box::new(depth_first::DepthFirst::make_state(grid)),
             Self::BreadthFirst => Box::new(BreadthFirst::make_state(grid)),
             Self::Dijkstra => Box::new(dijkstra::Dijkstra::make_state(grid)),
-            Self::AStar => Box::new(astar::AStar::make_state(grid)),
+            Self::AStar => Box::new(a_star::AStar::make_state(grid)),
         }
     }
 }
