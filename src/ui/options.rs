@@ -1,14 +1,50 @@
-use crate::pathfinders::PathFindAlgorithms;
+use crate::pathfinders::{Grid, PathFindAlgorithms, Pos, Unit};
 use std::ops::Deref;
 use wasm_bindgen::JsCast;
-use web_sys::HtmlSelectElement;
-use yew::{classes, function_component, html, use_mut_ref, Callback, Event, Html, Properties};
+use web_sys::{HtmlInputElement, HtmlSelectElement, InputEvent};
+use yew::{
+    classes, function_component, html, use_mut_ref, use_state, Callback, Event, Html, Properties,
+};
+
+#[derive(Copy, Clone, PartialEq)]
+pub struct GridOptions {
+    pub rows: usize,
+    pub columns: usize,
+    pub start_pos: Pos,
+    pub end_pos: Pos,
+}
+
+impl Default for GridOptions {
+    fn default() -> Self {
+        Self {
+            rows: 10,
+            columns: 10,
+            start_pos: Pos { x: 0, y: 0 },
+            end_pos: Pos { x: 9, y: 9 },
+        }
+    }
+}
+
+impl From<GridOptions> for Grid {
+    fn from(value: GridOptions) -> Self {
+        Self::new(
+            value.rows as Unit,
+            value.columns as Unit,
+            value.start_pos,
+            value.end_pos,
+        )
+    }
+}
 
 #[derive(Properties, PartialEq)]
 pub struct OptionsProps {
     #[prop_or(PathFindAlgorithms::BreadthFirst)]
     pub default_path_finder: PathFindAlgorithms,
     pub on_find_path: Callback<PathFindAlgorithms>,
+    #[prop_or_default]
+    pub default_grid_options: GridOptions,
+    #[prop_or(Callback::noop())]
+    pub on_grid_options_change: Callback<GridOptions>,
 }
 
 #[function_component]
@@ -17,6 +53,7 @@ pub fn Options(props: &OptionsProps) -> Html {
         let default_path_finder = props.default_path_finder;
         use_mut_ref(|| default_path_finder)
     };
+    let grid_options = use_state(|| props.default_grid_options);
 
     let on_click_find_path = {
         let on_find_path = props.on_find_path.clone();
@@ -41,6 +78,51 @@ pub fn Options(props: &OptionsProps) -> Html {
         })
     };
 
+    let on_rows_change = {
+        let on_grid_options_change = props.on_grid_options_change.clone();
+        let grid_options = grid_options.clone();
+
+        Callback::from(move |e: Event| {
+            let target = e
+                .target()
+                .expect("Unable to get event target")
+                .dyn_into::<HtmlInputElement>()
+                .expect("Unable to cast to HtmlInputElement");
+            let rows = target
+                .value()
+                .parse::<usize>()
+                .expect("Unable to parse rows to usize");
+
+            let mut new_grid_options = *grid_options.deref();
+            new_grid_options.rows = rows;
+
+            on_grid_options_change.emit(new_grid_options);
+            grid_options.set(new_grid_options);
+        })
+    };
+    let on_columns_change = {
+        let on_grid_options_change = props.on_grid_options_change.clone();
+        let grid_options = grid_options.clone();
+
+        Callback::from(move |e: Event| {
+            let target = e
+                .target()
+                .expect("Unable to get event target")
+                .dyn_into::<HtmlInputElement>()
+                .expect("Unable to cast to HtmlInputElement");
+            let columns = target
+                .value()
+                .parse::<usize>()
+                .expect("Unable to parse rows to usize");
+
+            let mut new_grid_options = *grid_options.deref();
+            new_grid_options.columns = columns;
+
+            on_grid_options_change.emit(new_grid_options);
+            grid_options.set(new_grid_options);
+        })
+    };
+
     let selected_path_finder = *selected_path_finder.borrow().deref();
     html! {
         <div class={classes!("options")}>
@@ -51,6 +133,8 @@ pub fn Options(props: &OptionsProps) -> Html {
                 {create_option(PathFindAlgorithms::AStar, selected_path_finder, "A*")}
             </select>
             <button onclick={on_click_find_path}>{"Start Search"}</button>
+            <input type="number" min="1" max="100" value={grid_options.rows.to_string()} onchange={on_rows_change} />
+            <input type="number" min="1" max="100" value={grid_options.columns.to_string()} onchange={on_columns_change} />
         </div>
     }
 }

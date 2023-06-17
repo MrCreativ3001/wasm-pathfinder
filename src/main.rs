@@ -1,7 +1,7 @@
 use crate::pathfinders::{Grid, PathFindAlgorithm, PathFindAlgorithms, Pos, Tile};
-use crate::ui::options::Options;
+use crate::ui::options::{GridOptions, Options};
 use gloo::timers::callback::Interval;
-use std::ops::{Deref};
+use std::ops::Deref;
 use ui::grid::GridComponent;
 use yew::prelude::*;
 
@@ -10,7 +10,14 @@ mod ui;
 
 #[function_component]
 fn App() -> Html {
-    let grid = use_state(|| Grid::new(10, 10, Pos { x: 0, y: 0 }, Pos { x: 9, y: 9 }));
+    let default_grid_options = GridOptions {
+        rows: 10,
+        columns: 10,
+        start_pos: Pos { x: 0, y: 0 },
+        end_pos: Pos { x: 9, y: 9 },
+    };
+
+    let grid: UseStateHandle<Grid> = use_state(|| GridOptions::into(default_grid_options));
     let path_finder_state = use_mut_ref::<Option<Box<dyn PathFindAlgorithm>>, _>(|| None);
     let cached_path: UseStateHandle<Vec<Pos>> = use_state(|| Vec::with_capacity(0));
 
@@ -77,9 +84,23 @@ fn App() -> Html {
                 // while we still own the interval, it will keep running, for cleanup we need to drop it
                 move || drop(interval)
             },
-            (), // no dependencies. The normal use_effect would run every rerender of the component. This will only run once
+            grid.clone(),
         );
     }
+
+    let on_grid_options_change = {
+        let grid = grid.clone();
+        let cached_path = cached_path.clone();
+        let path_finder_state = path_finder_state.clone();
+
+        Callback::from(move |new_options: GridOptions| {
+            let new_grid: Grid = new_options.into();
+
+            path_finder_state.replace_with(|_| None);
+            grid.set(new_grid);
+            cached_path.set(Vec::with_capacity(0));
+        })
+    };
 
     let grid_component_visited = {
         let path_finder_state = path_finder_state.clone();
@@ -97,7 +118,7 @@ fn App() -> Html {
 
     html!(
         <div>
-          <Options on_find_path={on_find_path} />
+          <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} />
           <GridComponent grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click}/>
         </div>
     )

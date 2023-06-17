@@ -83,10 +83,10 @@ impl<T> Vec2d<T> {
         }
         let x = pos.x as usize;
         let y = pos.y as usize;
-        if x >= self.columns || y >= self.rows {
+        if x >= self.rows || y >= self.columns {
             return None;
         }
-        Some(y * self.columns + x)
+        Some(y * self.rows + x)
     }
 }
 
