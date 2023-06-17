@@ -95,6 +95,7 @@ pub fn Options(props: &OptionsProps) -> Html {
 
             let mut new_grid_options = *grid_options.deref();
             new_grid_options.rows = rows;
+            update_start_end(&mut new_grid_options);
 
             on_grid_options_change.emit(new_grid_options);
             grid_options.set(new_grid_options);
@@ -117,6 +118,7 @@ pub fn Options(props: &OptionsProps) -> Html {
 
             let mut new_grid_options = *grid_options.deref();
             new_grid_options.columns = columns;
+            update_start_end(&mut new_grid_options);
 
             on_grid_options_change.emit(new_grid_options);
             grid_options.set(new_grid_options);
@@ -150,6 +152,17 @@ fn create_option(
     html! {
         <option value={path_finder_str} selected={selected}>{name}</option>
     }
+}
+
+fn update_start_end(grid_options: &mut GridOptions) {
+    fn update_pos(grid_options: &GridOptions, pos: Pos) -> Pos {
+        Pos {
+            x: pos.x.min(grid_options.rows as Unit - 1),
+            y: pos.y.min(grid_options.columns as Unit - 1),
+        }
+    }
+    grid_options.start_pos = update_pos(grid_options, grid_options.start_pos);
+    grid_options.end_pos = update_pos(grid_options, grid_options.end_pos);
 }
 
 fn path_finder_str(path_finder: PathFindAlgorithms) -> &'static str {
