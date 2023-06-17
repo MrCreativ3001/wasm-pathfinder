@@ -143,16 +143,16 @@ impl Grid {
         self.start
     }
     pub fn set_start(&mut self, pos: Pos) {
-        self.start = pos;
         self.set_tile(pos, Tile::None);
+        self.start = pos;
     }
 
     pub fn end(&self) -> Pos {
         self.end
     }
     pub fn set_end(&mut self, pos: Pos) {
-        self.end = pos;
         self.set_tile(pos, Tile::None);
+        self.end = pos;
     }
 }
 

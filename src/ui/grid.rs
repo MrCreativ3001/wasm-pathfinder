@@ -1,7 +1,8 @@
 use crate::pathfinders::{Grid, Pos, Tile, Unit};
-use std::ops::{BitAnd, Range};
+use std::ops::{BitAnd, Deref, Range};
 use yew::{
-    classes, function_component, html, Callback, Classes, DragEvent, Html, MouseEvent, Properties,
+    classes, function_component, html, use_mut_ref, Callback, Classes, DragEvent, Html, MouseEvent,
+    Properties,
 };
 
 #[derive(Properties, PartialEq)]
@@ -13,10 +14,23 @@ pub struct GridProps {
     pub visited: Callback<Pos, bool>,
     #[prop_or_default]
     pub on_tile_click: Callback<Pos>,
+    #[prop_or_default]
+    pub on_start_move: Callback<Pos>,
+    #[prop_or_default]
+    pub on_end_move: Callback<Pos>,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+enum DragState {
+    None,
+    Start,
+    End,
 }
 
 #[function_component]
 pub fn GridComponent(props: &GridProps) -> Html {
+    let drag_state = use_mut_ref(|| DragState::None);
+
     let grid = &props.grid;
     let start = grid.start();
     let end = grid.end();
@@ -31,16 +45,48 @@ pub fn GridComponent(props: &GridProps) -> Html {
                         let is_tile_start= pos == start;
                         let is_tile_end = pos == end;
                         let is_tile_path = props.path.contains(&pos);
-
-                        let on_tile_click = {
-                            let on_tile_click = props.on_tile_click.clone();
-                            Callback::from(move |_| {
-                                on_tile_click.emit(pos)
-                            })
-                        };
                         let is_visited = props.visited.emit(pos);
 
-                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} is_path={is_tile_path} is_visited={is_visited} on_tile_click={on_tile_click} />)
+                        let tile_on_tile_click = {
+                            let on_tile_click = props.on_tile_click.clone();
+                            let on_start_move = props.on_start_move.clone();
+                            let on_end_move = props.on_end_move.clone();
+                            let drag_state = drag_state.clone();
+
+                            Callback::from(move |_| {
+                                if is_tile_start {
+                                    drag_state.replace_with(|_| DragState::Start);
+                                } else if is_tile_end {
+                                    drag_state.replace_with(|_| DragState::End);
+                                } else {
+                                    match drag_state.borrow().deref() {
+                                        DragState::Start => on_start_move.emit(pos),
+                                        DragState::End => on_end_move.emit(pos),
+                                        DragState::None => on_tile_click.emit(pos)
+                                    }
+                                }
+                            })
+                        };
+                        let on_tile_mouse_enter = {
+                            let on_start_move = props.on_start_move.clone();
+                            let on_end_move = props.on_end_move.clone();
+                            let on_tile_click = props.on_tile_click.clone();
+                            let drag_state = drag_state.clone();
+
+                            Callback::from(move |mouse_down| {
+                                if mouse_down {
+                                    match drag_state.borrow().deref() {
+                                        DragState::Start => on_start_move.emit(pos),
+                                        DragState::End => on_end_move.emit(pos),
+                                        DragState::None => on_tile_click.emit(pos),
+                                    }
+                                } else {
+                                    drag_state.replace_with(|_| DragState::None);
+                                }
+                            })
+                        };
+
+                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} is_path={is_tile_path} is_visited={is_visited} on_tile_click={tile_on_tile_click} on_tile_mouse_enter={on_tile_mouse_enter} />)
                     })
                 })
         }
@@ -67,6 +113,7 @@ struct TileProps {
     pub is_path: bool,
     pub is_visited: bool,
     pub on_tile_click: Callback<()>,
+    pub on_tile_mouse_enter: Callback<bool>,
 }
 #[function_component]
 fn TileComponent(props: &TileProps) -> Html {
@@ -86,22 +133,27 @@ fn TileComponent(props: &TileProps) -> Html {
         (Tile::None, _, _, _, _) => "tile-none",
     };
 
-    let on_mouse_check = {
+    let on_mouse_down = {
         let on_tile_click = props.on_tile_click.clone();
+
+        Callback::from(move |e: MouseEvent| {
+            on_tile_click.emit(());
+        })
+    };
+    let on_mouse_enter = {
+        let on_tile_mouse_enter = props.on_tile_mouse_enter.clone();
 
         Callback::from(move |e: MouseEvent| {
             const LEFT_MOUSE_BUTTON_BITMASK: u16 = 1;
             let mouse_down = e.buttons().bitand(LEFT_MOUSE_BUTTON_BITMASK) != 0;
 
-            if mouse_down {
-                on_tile_click.emit(())
-            }
+            on_tile_mouse_enter.emit(mouse_down)
         })
     };
 
     let prevent_drag = { Callback::from(move |e: DragEvent| e.prevent_default()) };
 
     html!(
-        <div class={classes!("tile", class)} onmousedown={on_mouse_check.clone()} onmouseenter={on_mouse_check} ondragstart={prevent_drag} />
+        <div class={classes!("tile", class)} onmousedown={on_mouse_down} onmouseenter={on_mouse_enter} ondragstart={prevent_drag} />
     )
 }

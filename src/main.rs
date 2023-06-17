@@ -36,6 +36,26 @@ fn App() -> Html {
             grid.set(grid_mut);
         })
     };
+    let on_start_move = {
+        let grid = grid.clone();
+        Callback::from(move |pos| {
+            let mut grid_mut = grid.deref().clone();
+
+            grid_mut.set_start(pos);
+
+            grid.set(grid_mut);
+        })
+    };
+    let on_end_move = {
+        let grid = grid.clone();
+        Callback::from(move |pos| {
+            let mut grid_mut = grid.deref().clone();
+
+            grid_mut.set_end(pos);
+
+            grid.set(grid_mut);
+        })
+    };
 
     let on_find_path = {
         let grid = grid.clone();
@@ -75,7 +95,7 @@ fn App() -> Html {
                             if !cached_path.is_empty() {
                                 cached_path.set(Vec::with_capacity(0));
                             }
-                            // rerender the grid component (this is a hack, because we need to change the state of it to rerender it)
+                            // rerender the grid component (this is a hack, because we need to change the state of it to rerender it) TODO: find a better way
                             cached_path.set(cached_path.deref().clone());
                         }
                     };
@@ -119,7 +139,7 @@ fn App() -> Html {
     html!(
         <div>
           <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} />
-          <GridComponent grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click}/>
+          <GridComponent grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
         </div>
     )
 }
