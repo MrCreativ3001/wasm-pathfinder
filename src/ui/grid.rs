@@ -1,8 +1,8 @@
 use crate::pathfinders::{Grid, Pos, Tile, Unit};
-use std::ops::{BitAnd, Deref, Range};
+use std::ops::{BitAnd, Deref, Range, RangeBounds};
 use yew::{
-    classes, function_component, html, use_mut_ref, Callback, Classes, DragEvent, Html, MouseEvent,
-    Properties,
+    classes, function_component, html, props, Callback, Classes, Component, Context, DragEvent,
+    Html, MouseEvent, Properties,
 };
 
 #[derive(Properties, PartialEq)]
@@ -27,82 +27,133 @@ enum DragState {
     End,
 }
 
-#[function_component]
-pub fn GridComponent(props: &GridProps) -> Html {
-    let drag_state = use_mut_ref(|| DragState::None);
-
-    let grid = &props.grid;
-    let start = grid.start();
-    let end = grid.end();
-
-    html!(
-        <div class={classes!("grid")}>
-            {
-                html_list(0..grid.rows(), classes!("rows"), |x| {
-                    html_list(0..grid.columns(), classes!("row"), |y| {
-                        let pos = Pos { x, y };
-                        let tile = grid.tile(pos);
-                        let is_tile_start= pos == start;
-                        let is_tile_end = pos == end;
-                        let is_tile_path = props.path.contains(&pos);
-                        let is_visited = props.visited.emit(pos);
-
-                        let tile_on_tile_click = {
-                            let on_tile_click = props.on_tile_click.clone();
-                            let on_start_move = props.on_start_move.clone();
-                            let on_end_move = props.on_end_move.clone();
-                            let drag_state = drag_state.clone();
-
-                            Callback::from(move |e| {
-                                if is_tile_start {
-                                    drag_state.replace_with(|_| DragState::Start);
-                                } else if is_tile_end {
-                                    drag_state.replace_with(|_| DragState::End);
-                                } else {
-                                    match drag_state.borrow().deref() {
-                                        DragState::Start => on_start_move.emit(pos),
-                                        DragState::End => on_end_move.emit(pos),
-                                        DragState::None => on_tile_click.emit(pos)
-                                    }
-                                }
-                            })
-                        };
-                        let on_tile_mouse_enter = {
-                            let on_start_move = props.on_start_move.clone();
-                            let on_end_move = props.on_end_move.clone();
-                            let on_tile_click = props.on_tile_click.clone();
-                            let drag_state = drag_state.clone();
-
-                            Callback::from(move |mouse_down| {
-                                if mouse_down {
-                                    match drag_state.borrow().deref() {
-                                        DragState::Start => on_start_move.emit(pos),
-                                        DragState::End => on_end_move.emit(pos),
-                                        DragState::None => on_tile_click.emit(pos),
-                                    }
-                                } else {
-                                    drag_state.replace_with(|_| DragState::None);
-                                }
-                            })
-                        };
-
-                        html!(<TileComponent tile={tile} is_start={is_tile_start} is_end={is_tile_end} is_path={is_tile_path} is_visited={is_visited} on_tile_click={tile_on_tile_click} on_tile_mouse_enter={on_tile_mouse_enter} />)
-                    })
-                })
-        }
-        </div>
-    )
+pub struct GridComponent {
+    drag_state: DragState,
 }
 
-fn html_list<F>(range: Range<Unit>, classes: Classes, f: F) -> Html
+pub enum GridMsg {
+    DragStart,
+    DragEnd,
+    DragNone,
+}
+
+impl Component for GridComponent {
+    type Message = GridMsg;
+    type Properties = GridProps;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {
+            drag_state: DragState::None,
+        }
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            GridMsg::DragStart => {
+                self.drag_state = DragState::Start;
+                false
+            }
+            GridMsg::DragEnd => {
+                self.drag_state = DragState::End;
+                false
+            }
+            GridMsg::DragNone => {
+                self.drag_state = DragState::None;
+                false
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let grid = &ctx.props().grid;
+        let props = ctx.props();
+        let drag_state = &self.drag_state;
+        let drag_state_change = ctx.link().callback(|new: DragState| match new {
+            DragState::None => GridMsg::DragNone,
+            DragState::Start => GridMsg::DragStart,
+            DragState::End => GridMsg::DragEnd,
+        });
+        let start = grid.start();
+        let end = grid.end();
+
+        html!(
+            <div class={classes!("grid")}>
+                {for gen_2d_iter(0..grid.rows(), 0..grid.columns()).map(|(x, y)| {
+                    let pos = Pos { x, y };
+                    let tile = grid.tile(pos);
+                    let is_tile_start= pos == start;
+                    let is_tile_end = pos == end;
+                    let is_tile_path = props.path.contains(&pos);
+                    let is_visited = props.visited.emit(pos);
+                    let is_new_line = y == 0;
+
+                    let tile_on_tile_click = {
+                        let on_tile_click = props.on_tile_click.clone();
+                        let on_start_move = props.on_start_move.clone();
+                        let on_end_move = props.on_end_move.clone();
+                        let drag_state = *drag_state;
+                        let drag_state_change = drag_state_change.clone();
+
+                        Callback::from(move |e| {
+                            if is_tile_start {
+                                drag_state_change.emit(DragState::Start);
+                            } else if is_tile_end {
+                                drag_state_change.emit(DragState::End);
+                            } else {
+                                match drag_state {
+                                    DragState::Start => on_start_move.emit(pos),
+                                    DragState::End => on_end_move.emit(pos),
+                                    DragState::None => on_tile_click.emit(pos)
+                                }
+                            }
+                        })
+                    };
+                    let on_tile_mouse_enter = {
+                        let on_start_move = props.on_start_move.clone();
+                        let on_end_move = props.on_end_move.clone();
+                        let on_tile_click = props.on_tile_click.clone();
+                        let drag_state = *drag_state;
+                        let drag_state_change = drag_state_change.clone();
+
+                        Callback::from(move |mouse_down| {
+                            if mouse_down {
+                                match drag_state {
+                                    DragState::Start => on_start_move.emit(pos),
+                                    DragState::End => on_end_move.emit(pos),
+                                    DragState::None => on_tile_click.emit(pos),
+                                }
+                            } else {
+                                drag_state_change.emit(DragState::None);
+                            }
+                        })
+                    };
+
+                    html!{
+                        <TileComponent
+                            tile={tile}
+                            is_start={is_tile_start}
+                            is_end={is_tile_end}
+                            is_path={is_tile_path}
+                            is_visited={is_visited}
+                            on_tile_click={tile_on_tile_click}
+                            on_tile_mouse_enter={on_tile_mouse_enter}
+                            tile_key={pos}
+                            is_new_line={is_new_line}
+                        />
+                    }
+                }) }
+            </div>
+        )
+    }
+}
+
+fn gen_2d_iter<N>(x: Range<N>, y: Range<N>) -> impl Iterator<Item = (N, N)>
 where
-    F: Fn(Unit) -> Html,
+    N: Copy,
+    Range<N>: IntoIterator<Item = N>,
 {
-    html!(
-        <div class={classes}>
-            { range.map(f).collect::<Vec<_>>() }
-        </div>
-    )
+    x.into_iter()
+        .flat_map(move |x| y.clone().into_iter().map(move |y| (x, y)))
 }
 
 #[derive(Properties, PartialEq)]
@@ -114,6 +165,8 @@ struct TileProps {
     pub is_visited: bool,
     pub on_tile_click: Callback<()>,
     pub on_tile_mouse_enter: Callback<bool>,
+    pub tile_key: Pos,
+    pub is_new_line: bool,
 }
 #[function_component]
 fn TileComponent(props: &TileProps) -> Html {
@@ -132,6 +185,7 @@ fn TileComponent(props: &TileProps) -> Html {
         (_, _, _, true, _) => "tile-path",
         (Tile::None, _, _, _, _) => "tile-none",
     };
+    let tile_classes: Classes = classes!("tile", class);
 
     const LEFT_MOUSE_BUTTON_BITMASK: u16 = 1;
     let on_mouse_down = {
@@ -158,6 +212,11 @@ fn TileComponent(props: &TileProps) -> Html {
     let prevent_drag = { Callback::from(move |e: DragEvent| e.prevent_default()) };
 
     html!(
-        <div class={classes!("tile", class)} onmousedown={on_mouse_down} onmouseenter={on_mouse_enter} ondragstart={prevent_drag} />
+        <>
+            if props.is_new_line {
+                <div class={classes!("grid-newline")} key={"newline"} />
+            }
+            <div class={tile_classes} key={format!("{}-{}", props.tile_key.x, props.tile_key.x)} onmousedown={on_mouse_down} onmouseenter={on_mouse_enter} ondragstart={prevent_drag} />
+        </>
     )
 }
