@@ -214,7 +214,7 @@ fn TileComponent(props: &TileProps) -> Html {
     html!(
         <>
             if props.is_new_line {
-                <div class={classes!("grid-newline")} key={"newline"} />
+                <div class={classes!("grid-newline")} />
             }
             <div class={tile_classes} key={format!("{}-{}", props.tile_key.x, props.tile_key.x)} onmousedown={on_mouse_down} onmouseenter={on_mouse_enter} ondragstart={prevent_drag} />
         </>
