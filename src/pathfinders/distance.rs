@@ -27,6 +27,7 @@ pub fn distance_to_start(
     None
 }
 
+// TODO: Use heuristic distance instead of euclidean distance
 pub fn guess_distance(pos1: Pos, pos2: Pos) -> f32 {
     let xdiff = (pos2.x - pos1.x) as f32;
     let ydiff = (pos2.y - pos1.y) as f32;

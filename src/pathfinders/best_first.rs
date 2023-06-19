@@ -8,7 +8,7 @@ use std::collections::VecDeque;
 pub trait PosPrioritizer {
     fn new_prioritizer(grid: &Grid) -> Self;
     /// Returns the index of the prioritized position in the queue.
-    /// The queue is sorted from first(i = 0) added to last(i = queue.len()) added.
+    /// The queue is sorted from first(i = 0) added to last(i = queue.len() - 1) added.
     fn find_prioritized_pos(
         &mut self,
         queue: &VecDeque<Pos>,
