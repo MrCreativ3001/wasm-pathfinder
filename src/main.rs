@@ -1,4 +1,5 @@
 use crate::pathfinders::{Grid, PathFindAlgorithm, PathFindAlgorithms, Pos, Tile};
+use crate::ui::grid::GridRenderMode;
 use crate::ui::options::{GridOptions, Options};
 use gloo::timers::callback::Interval;
 use std::ops::Deref;
@@ -20,6 +21,7 @@ fn App() -> Html {
     let grid: UseStateHandle<Grid> = use_state(|| GridOptions::into(default_grid_options));
     let path_finder_state = use_mut_ref::<Option<Box<dyn PathFindAlgorithm>>, _>(|| None);
     let cached_path: UseStateHandle<Vec<Pos>> = use_state(|| Vec::with_capacity(0));
+    let grid_render_mode: UseStateHandle<GridRenderMode> = use_state(|| GridRenderMode::WebGL2);
 
     let on_tile_click = {
         let grid = grid.clone();
@@ -136,10 +138,18 @@ fn App() -> Html {
         })
     };
 
+    let on_grid_renderer_change = {
+        let grid_render_mode = grid_render_mode.clone();
+
+        Callback::from(move |new_mode: GridRenderMode| {
+            grid_render_mode.set(new_mode);
+        })
+    };
+
     html!(
         <>
-          <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} />
-          <GridComponent grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
+          <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} on_grid_renderer_change={on_grid_renderer_change} />
+          <GridComponent mode={*grid_render_mode} grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
         </>
     )
 }
