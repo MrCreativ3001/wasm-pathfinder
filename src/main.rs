@@ -17,11 +17,12 @@ fn App() -> Html {
         start_pos: Pos { x: 0, y: 0 },
         end_pos: Pos { x: 9, y: 9 },
     };
+    let default_render_mode = GridRenderMode::DOM;
 
     let grid: UseStateHandle<Grid> = use_state(|| GridOptions::into(default_grid_options));
     let path_finder_state = use_mut_ref::<Option<Box<dyn PathFindAlgorithm>>, _>(|| None);
     let cached_path: UseStateHandle<Vec<Pos>> = use_state(|| Vec::with_capacity(0));
-    let grid_render_mode: UseStateHandle<GridRenderMode> = use_state(|| GridRenderMode::WebGL2);
+    let grid_render_mode: UseStateHandle<GridRenderMode> = use_state(|| default_render_mode);
 
     let on_tile_click = {
         let grid = grid.clone();
@@ -148,7 +149,7 @@ fn App() -> Html {
 
     html!(
         <>
-          <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} on_grid_renderer_change={on_grid_renderer_change} />
+          <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} default_grid_renderer={default_render_mode} on_grid_renderer_change={on_grid_renderer_change} />
           <GridComponent mode={*grid_render_mode} grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
         </>
     )
