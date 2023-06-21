@@ -19,6 +19,13 @@ body {
 }
 
 /* Grid */
+.canvas-grid{
+    /** TODO: Substract options from width */
+    height: calc(100vmin - 40px);
+    max-height: calc(100vh - 40px);
+    width: calc(100vmin - 40px);
+    max-width: calc(100vmin - 40px);
+}
 .grid {
     display: flex;
     flex-direction: row;
