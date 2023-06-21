@@ -1,4 +1,5 @@
 use crate::pathfinders::{Grid, Pos, Tile};
+use crate::ui::grid::GridProps;
 use js_sys::Float32Array;
 use std::cell::RefCell;
 use std::ops::BitAnd;
@@ -13,22 +14,7 @@ use web_sys::{
 };
 use yew::{classes, html, Callback, Component, Context, Html, NodeRef, Properties};
 
-#[derive(Properties, PartialEq)]
-pub struct GridProps {
-    pub grid: Grid,
-    #[prop_or_default]
-    pub path: Vec<Pos>,
-    #[prop_or(Callback::from(|_| false))]
-    pub visited: Callback<Pos, bool>,
-    #[prop_or_default]
-    pub on_tile_click: Callback<Pos>,
-    #[prop_or_default]
-    pub on_start_move: Callback<Pos>,
-    #[prop_or_default]
-    pub on_end_move: Callback<Pos>,
-}
-
-pub struct GridComponent {
+pub struct WebGL2GridComponent {
     node_ref: NodeRef,
     grid_sender: Sender<VisualState>,
     grid_receiver: Option<Receiver<VisualState>>,
@@ -39,7 +25,7 @@ pub enum GridMsg {
     MouseEvent { tile: Option<Pos>, mouse_down: bool },
 }
 
-impl Component for GridComponent {
+impl Component for WebGL2GridComponent {
     type Message = GridMsg;
     type Properties = GridProps;
 
@@ -143,7 +129,7 @@ impl Component for GridComponent {
     }
 }
 
-impl GridComponent {
+impl WebGL2GridComponent {
     fn tile_size(canvas_width: i32, canvas_height: i32, grid_rows: i32, grid_columns: i32) -> f32 {
         let canvas_shortest_side = canvas_width.min(canvas_height);
 
@@ -285,7 +271,7 @@ impl GlGridRenderer {
         gl.viewport(0, 0, gl.drawing_buffer_width(), gl.drawing_buffer_height());
 
         // Load vertex shader
-        const VERTEX_SHADER: &str = include_str!("grid/basic.vert");
+        const VERTEX_SHADER: &str = include_str!("webgl2/basic.vert");
         let vertex_shader = gl
             .create_shader(GL::VERTEX_SHADER)
             .expect("Unable to create shader");
@@ -300,7 +286,7 @@ impl GlGridRenderer {
         }
 
         // Load fragment shader
-        const FRAGMENT_SHADER: &str = include_str!("grid/basic.frag");
+        const FRAGMENT_SHADER: &str = include_str!("webgl2/basic.frag");
         let fragment_shader = gl
             .create_shader(GL::FRAGMENT_SHADER)
             .expect("Unable to create shader");
@@ -384,7 +370,7 @@ impl GlGridRenderer {
         let gl = &self.gl;
 
         let grid = &state.grid;
-        self.tile_size = GridComponent::tile_size(
+        self.tile_size = WebGL2GridComponent::tile_size(
             gl.drawing_buffer_width(),
             gl.drawing_buffer_height(),
             grid.rows(),

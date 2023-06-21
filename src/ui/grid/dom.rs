@@ -1,24 +1,10 @@
 use crate::pathfinders::{Grid, Pos, Tile, Unit};
+use crate::ui::grid::GridProps;
 use std::ops::{BitAnd, Deref, Range, RangeBounds};
 use yew::{
     classes, function_component, html, props, Callback, Classes, Component, Context, DragEvent,
     Html, MouseEvent, Properties,
 };
-
-#[derive(Properties, PartialEq)]
-pub struct GridProps {
-    pub grid: Grid,
-    #[prop_or_default]
-    pub path: Vec<Pos>,
-    #[prop_or(Callback::from(|_| false))]
-    pub visited: Callback<Pos, bool>,
-    #[prop_or_default]
-    pub on_tile_click: Callback<Pos>,
-    #[prop_or_default]
-    pub on_start_move: Callback<Pos>,
-    #[prop_or_default]
-    pub on_end_move: Callback<Pos>,
-}
 
 #[derive(Clone, Copy, PartialEq)]
 enum DragState {
@@ -27,7 +13,7 @@ enum DragState {
     End,
 }
 
-pub struct GridComponent {
+pub struct DOMGridComponent {
     drag_state: DragState,
 }
 
@@ -37,7 +23,7 @@ pub enum GridMsg {
     DragNone,
 }
 
-impl Component for GridComponent {
+impl Component for DOMGridComponent {
     type Message = GridMsg;
     type Properties = GridProps;
 
