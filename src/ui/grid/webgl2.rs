@@ -439,12 +439,12 @@ impl GlGridRenderer {
                     (_, _, _, true, _) => Color::TILE_PATH,
                     (Tile::None, _, _, _, _) => Color::TILE_NONE,
                 };
-                self.draw_rect(x as f32, y as f32, color);
+                self.draw_tile(x as f32, y as f32, color);
             }
         }
     }
 
-    fn draw_rect(&self, x: f32, y: f32, color: Color) {
+    fn draw_tile(&self, x: f32, y: f32, color: Color) {
         let gl = &self.gl;
 
         // Bind VAO
