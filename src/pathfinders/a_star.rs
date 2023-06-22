@@ -3,8 +3,6 @@ use crate::pathfinders::distance::{distance_to_start, guess_distance};
 use crate::pathfinders::{Grid, Pos, Vec2d};
 use std::collections::VecDeque;
 
-// TODO: This implementation doesn't always find the shortest path
-
 pub type AStar = BestFirst<AStarPrioritizer>;
 
 pub struct AStarPrioritizer {
