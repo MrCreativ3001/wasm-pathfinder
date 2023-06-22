@@ -31,6 +31,7 @@ pub mod webgl2;
 
 #[function_component]
 pub fn GridComponent(props: &GridProps) -> Html {
+    // TODO: one grid renderer has the wrong orientation
     let props = props.clone();
     match props.mode {
         GridRenderMode::Dom => html!(<DOMGridComponent ..props />),
