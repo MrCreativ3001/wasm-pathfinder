@@ -64,14 +64,14 @@ impl Component for DOMGridComponent {
 
         html!(
             <div class={classes!("grid", "dom-grid")}>
-                {for gen_2d_iter(0..grid.rows(), 0..grid.columns()).map(|(x, y)| {
+                {for gen_2d_iter(0..grid.columns(), 0..grid.rows()).map(|(y, x)| {
                     let pos = Pos { x, y };
                     let tile = grid.tile(pos);
                     let is_tile_start= pos == start;
                     let is_tile_end = pos == end;
                     let is_tile_path = props.path.contains(&pos);
                     let is_visited = props.visited.contains(&pos);
-                    let is_new_line = y == 0;
+                    let is_new_line = x == 0;
 
                     let tile_on_tile_click = {
                         let on_tile_click = props.on_tile_click.clone();
