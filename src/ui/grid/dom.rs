@@ -1,8 +1,8 @@
-use crate::pathfinders::{Grid, Pos, Tile, Unit};
+use crate::pathfinders::{Pos, Tile};
 use crate::ui::grid::GridProps;
-use std::ops::{BitAnd, Deref, Range, RangeBounds};
+use std::ops::{BitAnd, Range, RangeBounds};
 use yew::{
-    classes, function_component, html, props, Callback, Classes, Component, Context, DragEvent,
+    classes, function_component, html, Callback, Classes, Component, Context, DragEvent,
     Html, MouseEvent, Properties,
 };
 
@@ -27,13 +27,13 @@ impl Component for DOMGridComponent {
     type Message = GridMsg;
     type Properties = GridProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             drag_state: DragState::None,
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             GridMsg::DragStart => {
                 self.drag_state = DragState::Start;
@@ -80,7 +80,7 @@ impl Component for DOMGridComponent {
                         let drag_state = *drag_state;
                         let drag_state_change = drag_state_change.clone();
 
-                        Callback::from(move |e| {
+                        Callback::from(move |_e| {
                             if is_tile_start {
                                 drag_state_change.emit(DragState::Start);
                             } else if is_tile_end {

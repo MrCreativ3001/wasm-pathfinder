@@ -2,7 +2,7 @@ use crate::pathfinders::{Grid, PathFindAlgorithms, Pos, Unit};
 use crate::ui::grid::GridRenderMode;
 use std::ops::Deref;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, HtmlSelectElement, InputEvent};
+use web_sys::{HtmlInputElement, HtmlSelectElement};
 use yew::{
     classes, function_component, html, use_mut_ref, use_state, Callback, Event, Html, Properties,
 };
@@ -186,7 +186,7 @@ pub fn Options(props: &OptionsProps) -> Html {
             <div>
                 <h3>{"Grid Renderer"}</h3>
                 <select onchange={on_grid_renderer_change}>
-                    {create_grid_renderer_option(GridRenderMode::DOM, grid_renderer, "DOM (slow)")}
+                    {create_grid_renderer_option(GridRenderMode::Dom, grid_renderer, "DOM (slow)")}
                     {create_grid_renderer_option(GridRenderMode::WebGL2, grid_renderer, "WebGL 2")}
                 </select>
             </div>
@@ -252,14 +252,14 @@ fn create_grid_renderer_option(
 
 fn grid_renderer_str(grid_renderer: GridRenderMode) -> &'static str {
     match grid_renderer {
-        GridRenderMode::DOM => "dom",
+        GridRenderMode::Dom => "dom",
         GridRenderMode::WebGL2 => "webgl_2",
     }
 }
 
 fn grid_renderer_from_str(str: &str) -> Option<GridRenderMode> {
     match str {
-        "dom" => Some(GridRenderMode::DOM),
+        "dom" => Some(GridRenderMode::Dom),
         "webgl_2" => Some(GridRenderMode::WebGL2),
         _ => None,
     }

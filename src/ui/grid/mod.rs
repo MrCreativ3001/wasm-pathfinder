@@ -6,7 +6,7 @@ use yew::{function_component, html, Callback, Html, Properties};
 #[derive(Clone, Copy, PartialEq)]
 pub enum GridRenderMode {
     WebGL2,
-    DOM,
+    Dom,
 }
 
 #[derive(Properties, Clone, PartialEq)]
@@ -33,7 +33,7 @@ pub mod webgl2;
 pub fn GridComponent(props: &GridProps) -> Html {
     let props = props.clone();
     match props.mode {
-        GridRenderMode::DOM => html!(<DOMGridComponent ..props />),
+        GridRenderMode::Dom => html!(<DOMGridComponent ..props />),
         GridRenderMode::WebGL2 => html!(<WebGL2GridComponent ..props />),
     }
 }

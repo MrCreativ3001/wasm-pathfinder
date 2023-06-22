@@ -2,17 +2,17 @@ use crate::pathfinders::{Grid, Pos, Tile};
 use crate::ui::grid::GridProps;
 use js_sys::Float32Array;
 use std::cell::RefCell;
-use std::ops::BitAnd;
+
 use std::rc::Rc;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender, TryRecvError};
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::{
-    window, HtmlCanvasElement, HtmlElement, MouseEvent, WebGl2RenderingContext as GL, WebGlBuffer,
+    window, HtmlCanvasElement, MouseEvent, WebGl2RenderingContext as GL, WebGlBuffer,
     WebGlProgram, WebGlUniformLocation, WebGlVertexArrayObject,
 };
-use yew::{classes, html, Callback, Component, Context, Html, NodeRef, Properties};
+use yew::{classes, html, Callback, Component, Context, Html, NodeRef};
 
 pub struct WebGL2GridComponent {
     node_ref: NodeRef,
@@ -112,7 +112,7 @@ impl Component for WebGL2GridComponent {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let on_mouse_event = {
             let grid = &ctx.props().grid;
-            let (grid_rows, grid_columns) = (grid.rows(), grid.columns());
+            let (_grid_rows, _grid_columns) = (grid.rows(), grid.columns());
 
             let link = ctx.link().clone();
             Callback::from(move |event: MouseEvent| {
