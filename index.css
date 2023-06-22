@@ -17,6 +17,12 @@ body {
 .options-grid {
     margin-left: 10px;
 }
+.options-renderer-header {
+    margin-bottom: 0;
+}
+.options-renderer {
+    margin-left: 10px;
+}
 
 /* Grid */
 .grid {

@@ -184,8 +184,8 @@ pub fn Options(props: &OptionsProps) -> Html {
             </div>
 
             <div>
-                <h3>{"Grid Renderer"}</h3>
-                <select onchange={on_grid_renderer_change}>
+                <h3 class={classes!("options-renderer-header")}>{"Grid Renderer"}</h3>
+                <select class={classes!("options-renderer")} onchange={on_grid_renderer_change}>
                     {create_grid_renderer_option(GridRenderMode::Dom, grid_renderer, "DOM (slow)")}
                     {create_grid_renderer_option(GridRenderMode::WebGL2, grid_renderer, "WebGL 2")}
                 </select>
