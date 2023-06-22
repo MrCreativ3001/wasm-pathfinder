@@ -281,7 +281,6 @@ impl GlGridRenderer {
         }
     }
 
-    // TODO: Update viewport
     fn init_gl(&mut self) {
         let gl = &self.gl;
 
@@ -400,6 +399,9 @@ impl GlGridRenderer {
 
     fn render(&self) {
         let gl = &self.gl;
+
+        // Update viewport
+        gl.viewport(0, 0, gl.drawing_buffer_width(), gl.drawing_buffer_height());
 
         gl.use_program(self.shader_program.as_ref());
 
