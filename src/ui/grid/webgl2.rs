@@ -18,7 +18,9 @@ pub struct WebGL2GridComponent {
     node_ref: NodeRef,
     grid_sender: Sender<VisualState>,
     grid_receiver: Option<Receiver<VisualState>>,
-    old_tile: Option<Pos>,
+    old_pos: Option<Pos>,
+    is_dragging_start: bool, // Old tile is start
+    is_dragging_end: bool,   // Old tile is end
 }
 
 pub enum GridMsg {
@@ -39,7 +41,9 @@ impl Component for WebGL2GridComponent {
             node_ref: NodeRef::default(),
             grid_sender: sender,
             grid_receiver: Some(receiver),
-            old_tile: None,
+            old_pos: None,
+            is_dragging_start: false,
+            is_dragging_end: false,
         }
     }
 
@@ -49,26 +53,37 @@ impl Component for WebGL2GridComponent {
             mouse_down,
         } = msg
         {
-            // TODO: be able to move start and end
-            match self.old_tile {
-                None => {
-                    if mouse_down {
-                        self.old_tile = Some(new_pos);
-                        ctx.props().on_tile_click.emit(new_pos);
+            if mouse_down {
+                if ctx.props().grid.start() == new_pos || self.is_dragging_start {
+                    self.is_dragging_start = true;
+                    if let Some(old_pos) = self.old_pos {
+                        if old_pos != new_pos {
+                            ctx.props().on_start_move.emit(new_pos);
+                        }
+                    }
+                    self.old_pos = Some(new_pos);
+                } else if ctx.props().grid.end() == new_pos || self.is_dragging_end {
+                    self.is_dragging_end = true;
+                    if let Some(old_pos) = self.old_pos {
+                        if old_pos != new_pos {
+                            ctx.props().on_end_move.emit(new_pos);
+                        }
+                    }
+                    self.old_pos = Some(new_pos);
+                } else {
+                    if let Some(old_pos) = self.old_pos {
+                        if old_pos != new_pos {
+                            ctx.props().on_tile_click.emit(new_pos);
+                        }
                     } else {
-                        self.old_tile = None;
+                        ctx.props().on_tile_click.emit(new_pos);
                     }
+                    self.old_pos = Some(new_pos);
                 }
-                Some(old_pos) => {
-                    let has_new_tile = old_pos != new_pos;
-
-                    if mouse_down && has_new_tile {
-                        self.old_tile = Some(new_pos);
-                    }
-                    if !mouse_down {
-                        self.old_tile = None;
-                    }
-                }
+            } else {
+                self.old_pos = None;
+                self.is_dragging_start = false;
+                self.is_dragging_end = false;
             }
         }
 

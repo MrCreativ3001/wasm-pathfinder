@@ -17,7 +17,7 @@ fn App() -> Html {
         start_pos: Pos { x: 0, y: 0 },
         end_pos: Pos { x: 9, y: 9 },
     };
-    let default_render_mode = GridRenderMode::DOM;
+    let default_render_mode = GridRenderMode::WebGL2;
 
     let grid: UseStateHandle<Grid> = use_state(|| GridOptions::into(default_grid_options));
     let path_finder_state = use_mut_ref::<Option<Box<dyn PathFindAlgorithm>>, _>(|| None);
