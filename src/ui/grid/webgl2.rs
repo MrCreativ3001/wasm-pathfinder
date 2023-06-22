@@ -23,12 +23,12 @@ pub struct WebGL2GridComponent {
     is_dragging_end: bool,   // Old tile is end
 }
 
-pub enum GridMsg {
-    MouseEvent { tile: Option<Pos>, mouse_down: bool },
+pub enum WebGL2GridMsg {
+    MouseEvent { event: MouseEvent },
 }
 
 impl Component for WebGL2GridComponent {
-    type Message = GridMsg;
+    type Message = WebGL2GridMsg;
     type Properties = GridProps;
 
     fn create(ctx: &Context<Self>) -> Self {
@@ -48,11 +48,16 @@ impl Component for WebGL2GridComponent {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        if let GridMsg::MouseEvent {
-            tile: Some(new_pos),
-            mouse_down,
-        } = msg
-        {
+        if let WebGL2GridMsg::MouseEvent { event } = msg {
+            let grid = &ctx.props().grid;
+
+            let new_pos = match Self::mouse_event_to_tile(&event, grid.rows(), grid.columns()) {
+                Some(pos) => pos,
+                None => return false,
+            };
+            const LEFT_MOUSE_BUTTON: u16 = 1;
+            let mouse_down = event.buttons() & LEFT_MOUSE_BUTTON != 0;
+
             if mouse_down {
                 if ctx.props().grid.start() == new_pos || self.is_dragging_start {
                     self.is_dragging_start = true;
@@ -111,14 +116,7 @@ impl Component for WebGL2GridComponent {
 
             let link = ctx.link().clone();
             Callback::from(move |event: MouseEvent| {
-                const LEFT_MOUSE_BUTTON: u16 = 1;
-                let pos = Self::mouse_event_to_tile(&event, grid_rows, grid_columns);
-
-                let msg = GridMsg::MouseEvent {
-                    tile: pos,
-                    mouse_down: event.buttons().bitand(LEFT_MOUSE_BUTTON) != 0,
-                };
-                link.send_message(msg);
+                link.send_message(WebGL2GridMsg::MouseEvent { event });
             })
         };
 
