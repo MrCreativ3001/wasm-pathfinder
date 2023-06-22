@@ -403,8 +403,6 @@ impl GlGridRenderer {
         // Update viewport
         gl.viewport(0, 0, gl.drawing_buffer_width(), gl.drawing_buffer_height());
 
-        gl.use_program(self.shader_program.as_ref());
-
         // Clear the screen
         gl.clear_color(1.0, 1.0, 1.0, 1.0);
         gl.clear(GL::COLOR_BUFFER_BIT);
@@ -448,6 +446,9 @@ impl GlGridRenderer {
 
     fn draw_tile(&self, x: f32, y: f32, color: Color) {
         let gl = &self.gl;
+
+        // Bind shader program
+        gl.use_program(self.shader_program.as_ref());
 
         // Bind VAO
         gl.bind_vertex_array(self.vao.as_ref());
