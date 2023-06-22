@@ -429,7 +429,7 @@ impl GlGridRenderer {
                 let is_start = pos == start;
                 let is_end = pos == end;
                 let is_path = state.path.contains(&pos);
-                let is_visited = state.visited.contains(&pos); // TODO: Find visited
+                let is_visited = state.visited.contains(&pos);
 
                 let color = match (tile, is_start, is_end, is_path, is_visited) {
                     (_, true, _, _, _) => Color::TILE_START,
