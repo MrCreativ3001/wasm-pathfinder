@@ -63,7 +63,7 @@ impl Component for DOMGridComponent {
         let end = grid.end();
 
         html!(
-            <div class={classes!("grid")}>
+            <div class={classes!("grid", "dom-grid")}>
                 {for gen_2d_iter(0..grid.rows(), 0..grid.columns()).map(|(x, y)| {
                     let pos = Pos { x, y };
                     let tile = grid.tile(pos);
