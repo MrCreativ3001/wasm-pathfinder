@@ -26,6 +26,7 @@ body {
 }
 .canvas-grid {
 }
+/* TODO: Fix */
 .dom-grid {
     display: flex;
     flex-direction: row;
