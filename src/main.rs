@@ -19,6 +19,7 @@ fn App() -> Html {
     };
     let default_render_mode = GridRenderMode::WebGL2;
 
+    let rerender = use_state(|| 0);
     let grid: UseStateHandle<Grid> = use_state(|| GridOptions::into(default_grid_options));
     let path_finder_state = use_mut_ref::<Option<Box<dyn PathFindAlgorithm>>, _>(|| None);
     let cached_path: UseStateHandle<Vec<Pos>> = use_state(|| Vec::with_capacity(0));
@@ -78,6 +79,7 @@ fn App() -> Html {
     {
         let path_finder_state = path_finder_state.clone();
         let cached_path = cached_path.clone();
+        let rerender = rerender.clone();
 
         use_effect_with_deps(
             move |_| {
@@ -100,8 +102,7 @@ fn App() -> Html {
                             if !cached_path.is_empty() {
                                 cached_path.set(Vec::with_capacity(0));
                             }
-                            // rerender the grid component (this is a hack, because we need to change the state of it to rerender it) TODO: find a better way
-                            cached_path.set(cached_path.deref().clone());
+                            rerender.set(0);
                         }
                     };
                 });
