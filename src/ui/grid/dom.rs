@@ -2,8 +2,8 @@ use crate::pathfinders::{Pos, Tile};
 use crate::ui::grid::GridProps;
 use std::ops::{BitAnd, Range, RangeBounds};
 use yew::{
-    classes, function_component, html, Callback, Classes, Component, Context, DragEvent,
-    Html, MouseEvent, Properties,
+    classes, function_component, html, Callback, Classes, Component, Context, DragEvent, Html,
+    MouseEvent, Properties,
 };
 
 #[derive(Clone, Copy, PartialEq)]
@@ -70,7 +70,7 @@ impl Component for DOMGridComponent {
                     let is_tile_start= pos == start;
                     let is_tile_end = pos == end;
                     let is_tile_path = props.path.contains(&pos);
-                    let is_visited = props.visited.emit(pos);
+                    let is_visited = props.visited.contains(&pos);
                     let is_new_line = y == 0;
 
                     let tile_on_tile_click = {

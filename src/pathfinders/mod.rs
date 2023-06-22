@@ -1,4 +1,5 @@
 use crate::pathfinders::breadth_first::BreadthFirst;
+use std::borrow::Cow;
 use std::fmt::Debug;
 use std::ops::Add;
 
@@ -189,6 +190,7 @@ pub trait PathFindAlgorithm {
     fn next_step(&mut self) -> Result<Vec<Pos>, PathFindAlgorithmStepResult>;
 
     fn visited(&self, pos: Pos) -> bool;
+    fn visited_list(&self) -> &[Pos];
     fn in_queue(&self, pos: Pos) -> bool;
 }
 

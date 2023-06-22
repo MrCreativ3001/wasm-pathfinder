@@ -9,8 +9,8 @@ use std::sync::mpsc::{Receiver, Sender, TryRecvError};
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_sys::{
-    window, HtmlCanvasElement, MouseEvent, WebGl2RenderingContext as GL, WebGlBuffer,
-    WebGlProgram, WebGlUniformLocation, WebGlVertexArrayObject,
+    window, HtmlCanvasElement, MouseEvent, WebGl2RenderingContext as GL, WebGlBuffer, WebGlProgram,
+    WebGlUniformLocation, WebGlVertexArrayObject,
 };
 use yew::{classes, html, Callback, Component, Context, Html, NodeRef};
 
@@ -232,15 +232,20 @@ impl WebGL2GridComponent {
 struct VisualState {
     grid: Grid,
     path: Vec<Pos>,
-    // TODO: Add a visited array
+    visited: Vec<Pos>,
 }
 
 impl From<&GridProps> for VisualState {
     fn from(props: &GridProps) -> Self {
         let grid = props.grid.clone();
         let path = props.path.clone();
+        let visited = props.visited.clone();
 
-        Self { grid, path }
+        Self {
+            grid,
+            path,
+            visited,
+        }
     }
 }
 
@@ -424,7 +429,7 @@ impl GlGridRenderer {
                 let is_start = pos == start;
                 let is_end = pos == end;
                 let is_path = state.path.contains(&pos);
-                let is_visited = false; // TODO: Find visited
+                let is_visited = state.visited.contains(&pos); // TODO: Find visited
 
                 let color = match (tile, is_start, is_end, is_path, is_visited) {
                     (_, true, _, _, _) => Color::TILE_START,
@@ -499,5 +504,5 @@ impl Color {
     pub const TILE_START: Color = color_rgb_255!(0, 255, 0);
     pub const TILE_END: Color = color_rgb_255!(255, 0, 0);
     pub const TILE_PATH: Color = color_rgb_255!(255, 255, 0);
-    pub const TILE_VISITED: Color = color_rgb_255!(255, 255, 255);
+    pub const TILE_VISITED: Color = color_rgb_255!(255, 0, 255);
 }

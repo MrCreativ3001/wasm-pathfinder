@@ -16,8 +16,8 @@ pub struct GridProps {
     pub grid: Grid,
     #[prop_or_default]
     pub path: Vec<Pos>,
-    #[prop_or(Callback::from(|_| false))]
-    pub visited: Callback<Pos, bool>,
+    #[prop_or_default]
+    pub visited: Vec<Pos>,
     #[prop_or_default]
     pub on_tile_click: Callback<Pos>,
     #[prop_or_default]

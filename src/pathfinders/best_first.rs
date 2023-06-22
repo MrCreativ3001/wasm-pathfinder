@@ -3,6 +3,7 @@ use crate::pathfinders::{
     Grid, PathFindAlgorithm, PathFindAlgorithmConstructor, PathFindAlgorithmStepResult, Pos, Tile,
     Vec2d,
 };
+use std::borrow::Cow;
 use std::collections::VecDeque;
 
 pub trait PosPrioritizer {
@@ -21,6 +22,7 @@ pub struct BestFirst<P: PosPrioritizer> {
     grid: Grid,
     queue: VecDeque<Pos>,
     backtrace: Vec2d<Option<Pos>>,
+    visited: Vec<Pos>,
     prioritizer: P,
 }
 
@@ -43,6 +45,7 @@ where
             queue: VecDeque::new(),
             prioritizer: P::new_prioritizer(&grid),
             grid,
+            visited: vec![],
         };
         state.init();
         state
@@ -94,7 +97,9 @@ where
                 continue;
             }
             self.queue.push_back(neighbor);
+
             self.backtrace.set(neighbor, Some(pos));
+            self.visited.push(neighbor);
         }
 
         Err(InProgress)
@@ -102,6 +107,10 @@ where
 
     fn visited(&self, pos: Pos) -> bool {
         matches!(self.backtrace.get(pos), Some(Some(_)))
+    }
+
+    fn visited_list(&self) -> &[Pos] {
+        &self.visited
     }
 
     fn in_queue(&self, pos: Pos) -> bool {

@@ -24,6 +24,7 @@ fn App() -> Html {
     let cached_path: UseStateHandle<Vec<Pos>> = use_state(|| Vec::with_capacity(0));
     let grid_render_mode: UseStateHandle<GridRenderMode> = use_state(|| default_render_mode);
 
+    // Grid Events
     let on_tile_click = {
         let grid = grid.clone();
         Callback::from(move |pos| {
@@ -60,6 +61,7 @@ fn App() -> Html {
         })
     };
 
+    // PathFinder searching
     let on_find_path = {
         let grid = grid.clone();
         let path_finder_state = path_finder_state.clone();
@@ -110,7 +112,15 @@ fn App() -> Html {
             grid.clone(),
         );
     }
+    // PathFinder visited
+    let path_finder_visited = path_finder_state
+        .borrow()
+        .deref()
+        .as_ref()
+        .map(|state| state.visited_list().to_owned())
+        .unwrap_or(Vec::with_capacity(0));
 
+    // Grid options
     let on_grid_options_change = {
         let grid = grid.clone();
         let cached_path = cached_path.clone();
@@ -150,7 +160,7 @@ fn App() -> Html {
     html!(
         <>
           <Options on_find_path={on_find_path} default_grid_options={default_grid_options} on_grid_options_change={on_grid_options_change} default_grid_renderer={default_render_mode} on_grid_renderer_change={on_grid_renderer_change} />
-          <GridComponent mode={*grid_render_mode} grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={grid_component_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
+          <GridComponent mode={*grid_render_mode} grid={grid.deref().clone()} path={cached_path.deref().clone()} visited={path_finder_visited} on_tile_click={on_tile_click} on_start_move={on_start_move} on_end_move={on_end_move} />
         </>
     )
 }
