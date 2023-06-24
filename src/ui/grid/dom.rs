@@ -1,6 +1,6 @@
 use crate::pathfinders::{Pos, Tile};
 use crate::ui::grid::GridProps;
-use std::ops::{BitAnd, Range, RangeBounds};
+use std::ops::{BitAnd, Range};
 use yew::{
     classes, function_component, html, Callback, Classes, Component, Context, DragEvent, Html,
     MouseEvent, Properties,
@@ -17,6 +17,7 @@ pub struct DOMGridComponent {
     drag_state: DragState,
 }
 
+#[allow(clippy::enum_variant_names)]
 pub enum GridMsg {
     DragStart,
     DragEnd,

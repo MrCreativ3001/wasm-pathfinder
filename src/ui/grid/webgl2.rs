@@ -48,47 +48,49 @@ impl Component for WebGL2GridComponent {
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        if let WebGL2GridMsg::MouseEvent { event } = msg {
-            let grid = &ctx.props().grid;
+        match msg {
+            WebGL2GridMsg::MouseEvent { event } => {
+                let grid = &ctx.props().grid;
 
-            let new_pos = match Self::mouse_event_to_tile(&event, grid.width(), grid.height()) {
-                Some(pos) => pos,
-                None => return false,
-            };
-            const LEFT_MOUSE_BUTTON: u16 = 1;
-            let mouse_down = event.buttons() & LEFT_MOUSE_BUTTON != 0;
+                let new_pos = match Self::mouse_event_to_tile(&event, grid.width(), grid.height()) {
+                    Some(pos) => pos,
+                    None => return false,
+                };
+                const LEFT_MOUSE_BUTTON: u16 = 1;
+                let mouse_down = event.buttons() & LEFT_MOUSE_BUTTON != 0;
 
-            if mouse_down {
-                if ctx.props().grid.start() == new_pos || self.is_dragging_start {
-                    self.is_dragging_start = true;
-                    if let Some(old_pos) = self.old_pos {
-                        if old_pos != new_pos {
-                            ctx.props().on_start_move.emit(new_pos);
+                if mouse_down {
+                    if ctx.props().grid.start() == new_pos || self.is_dragging_start {
+                        self.is_dragging_start = true;
+                        if let Some(old_pos) = self.old_pos {
+                            if old_pos != new_pos {
+                                ctx.props().on_start_move.emit(new_pos);
+                            }
                         }
-                    }
-                    self.old_pos = Some(new_pos);
-                } else if ctx.props().grid.end() == new_pos || self.is_dragging_end {
-                    self.is_dragging_end = true;
-                    if let Some(old_pos) = self.old_pos {
-                        if old_pos != new_pos {
-                            ctx.props().on_end_move.emit(new_pos);
+                        self.old_pos = Some(new_pos);
+                    } else if ctx.props().grid.end() == new_pos || self.is_dragging_end {
+                        self.is_dragging_end = true;
+                        if let Some(old_pos) = self.old_pos {
+                            if old_pos != new_pos {
+                                ctx.props().on_end_move.emit(new_pos);
+                            }
                         }
-                    }
-                    self.old_pos = Some(new_pos);
-                } else {
-                    if let Some(old_pos) = self.old_pos {
-                        if old_pos != new_pos {
+                        self.old_pos = Some(new_pos);
+                    } else {
+                        if let Some(old_pos) = self.old_pos {
+                            if old_pos != new_pos {
+                                ctx.props().on_tile_click.emit(new_pos);
+                            }
+                        } else {
                             ctx.props().on_tile_click.emit(new_pos);
                         }
-                    } else {
-                        ctx.props().on_tile_click.emit(new_pos);
+                        self.old_pos = Some(new_pos);
                     }
-                    self.old_pos = Some(new_pos);
+                } else {
+                    self.old_pos = None;
+                    self.is_dragging_start = false;
+                    self.is_dragging_end = false;
                 }
-            } else {
-                self.old_pos = None;
-                self.is_dragging_start = false;
-                self.is_dragging_end = false;
             }
         }
 
@@ -497,11 +499,6 @@ macro_rules! color_rgb_255 {
 }
 
 impl Color {
-    pub const WHITE: Color = Color {
-        r: 1.0,
-        g: 1.0,
-        b: 1.0,
-    };
     pub const TILE_NONE: Color = color_rgb_255!(52, 206, 255);
     pub const TILE_WALL: Color = color_rgb_255!(0, 0, 0);
     pub const TILE_START: Color = color_rgb_255!(0, 255, 0);

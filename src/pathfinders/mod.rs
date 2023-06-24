@@ -65,10 +65,6 @@ impl<T> Vec2d<T> {
         let i = self.index(pos)?;
         Some(&self.flattened[i])
     }
-    pub fn get_mut(&mut self, pos: Pos) -> Option<&mut T> {
-        let i = self.index(pos).expect("invalid position");
-        Some(&mut self.flattened[i])
-    }
     pub fn set(&mut self, pos: Pos, value: T) {
         let i = self.index(pos);
         let i = match i {
@@ -88,15 +84,6 @@ impl<T> Vec2d<T> {
             return None;
         }
         Some(y * self.width + x)
-    }
-}
-
-impl<T> Vec2d<T>
-where
-    T: PartialEq,
-{
-    pub fn contains(&self, value: T) -> bool {
-        self.flattened.contains(&value)
     }
 }
 
