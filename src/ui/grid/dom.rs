@@ -66,16 +66,16 @@ impl Component for DOMGridComponent {
         let style = {
             format!(
                 "grid-template-rows: repeat({rows}, 1fr) {empty_rows}fr; grid-template-columns: repeat({columns}, 1fr) {empty_columns}fr;",
-                rows = grid.width(),
-                empty_rows = (grid.height() - grid.width()).max(0),
-                columns = grid.height(),
-                empty_columns = (grid.width() - grid.height()).max(0)
+                rows = grid.height(),
+                empty_rows = (grid.width() - grid.height()).max(0),
+                columns = grid.width(),
+                empty_columns = (grid.height() - grid.width()).max(0)
             )
         };
 
         html!(
             <div style={style} class={classes!("grid", "dom-grid")}>
-                {for gen_2d_iter(0..grid.width(), 0..grid.height()).map(|(x, y)| {
+                {for gen_2d_iter(0..grid.height(), 0..grid.width()).map(|(y, x)| {
                     let pos = Pos { x, y };
                     let tile = grid.tile(pos);
                     let is_tile_start= pos == start;
@@ -83,7 +83,7 @@ impl Component for DOMGridComponent {
                     let is_tile_path = props.path.contains(&pos);
                     let is_visited = props.visited.contains(&pos);
 
-                    let is_line_end = pos.y == grid.height() - 1;
+                    let is_line_end = pos.x == grid.width() - 1;
 
                     let tile_on_tile_click = {
                         let on_tile_click = props.on_tile_click.clone();
