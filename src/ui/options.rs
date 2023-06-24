@@ -174,10 +174,12 @@ pub fn Options(props: &OptionsProps) -> Html {
                 <div class={classes!("options-grid")}>
                     <div>
                         <label>{"Rows: "}</label>
+                        <br />
                         <input type="range" min="1" max="25" value={grid_options.rows.to_string()} onchange={on_rows_change} />
                     </div>
                     <div>
                         <label>{"Columns: "}</label>
+                        <br />
                         <input type="range" min="1" max="25" value={grid_options.columns.to_string()} onchange={on_columns_change} />
                     </div>
                 </div>
