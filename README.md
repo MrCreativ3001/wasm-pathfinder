@@ -2,7 +2,7 @@
  
 ## Description
 This is a demo of pathfinding algorithm in Rust compiled to WebAssembly.
-The demo can be found [here](http://example.com).
+The demo can be found [here](https://mrcreativ3001.github.io/wasm-pathfinder/pages/index.html).
 
 ## How to build
 This project uses trunk to build and serve the web app. 
