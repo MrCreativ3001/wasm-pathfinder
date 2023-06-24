@@ -1,4 +1,4 @@
-# wasm-path-finder
+# wasm-pathfinder
  
 ## Description
 This is a demo of pathfinding algorithm in Rust compiled to WebAssembly.
