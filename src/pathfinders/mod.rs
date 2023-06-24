@@ -1,5 +1,5 @@
 use crate::pathfinders::breadth_first::BreadthFirst;
-use std::borrow::Cow;
+
 use std::fmt::Debug;
 use std::ops::Add;
 

@@ -79,7 +79,7 @@ fn App() -> Html {
     {
         let path_finder_state = path_finder_state.clone();
         let cached_path = cached_path.clone();
-        let rerender = rerender.clone();
+        let rerender = rerender;
 
         use_effect_with_deps(
             move |_| {
