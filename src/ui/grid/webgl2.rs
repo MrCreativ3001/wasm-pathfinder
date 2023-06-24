@@ -123,7 +123,7 @@ impl Component for WebGL2GridComponent {
         };
 
         html!(
-            <canvas class={classes!("canvas-grid")} ref={self.node_ref.clone()} width={1000} height={1000} onmousemove={on_mouse_event.clone()} onmousedown={on_mouse_event.clone()} onmouseup={on_mouse_event} />
+            <canvas class={classes!("grid", "canvas-grid")} ref={self.node_ref.clone()} width={1000} height={1000} onmousemove={on_mouse_event.clone()} onmousedown={on_mouse_event.clone()} onmouseup={on_mouse_event} />
         )
     }
 
