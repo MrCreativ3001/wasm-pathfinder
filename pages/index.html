@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Yew App</title>
+    <style type="text/css">:root {
+    --sidebar-width: 200px;
+}
+
+html, body {
+    display: flex;
+    flex-direction: row;
+    row-gap: 20px;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+/* Options */
+.options {
+    display: flex;
+    min-width: var(--sidebar-width);
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.options-grid-header {
+    margin-bottom: 0;
+}
+.options-grid {
+    margin-left: 10px;
+}
+.options-renderer-header {
+    margin-bottom: 0;
+}
+.options-renderer {
+    margin-left: 10px;
+}
+
+/* Grid */
+.grid {
+    width: calc(100vw - var(--sidebar-width));
+    height: calc(100vw - var(--sidebar-width));
+}
+@media (max-height: calc(100vw - 200px)) {
+    .grid {
+        width: 100vh;
+        height: 100vh;
+    }
+}
+.canvas-grid {
+    aspect-ratio: auto;
+}
+.dom-grid {
+    display: grid;
+}
+
+/* Tiles */
+.tile {
+    border: 1px solid black;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+.tile-none {
+    background-color: #34ceff;
+}
+.tile-wall {
+    background-color: #000000;
+}
+.tile-start {
+    background-color: #00ff00;
+}
+.tile-end {
+    background-color: #ff0000;
+}
+.tile-visited {
+    background-color: #ff00ff;
+}
+.tile-path {
+    background-color: #ffff00;
+}
+</style>
+
+<link rel="preload" href="/wasm-path-finder-1e0bfcf328ca0f48_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/wasm-path-finder-1e0bfcf328ca0f48.js"></head>
+<body><script type="module">import init from '/wasm-path-finder-1e0bfcf328ca0f48.js';init('/wasm-path-finder-1e0bfcf328ca0f48_bg.wasm');</script></body></html>
