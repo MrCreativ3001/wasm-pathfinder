@@ -1,7 +1,14 @@
 # wasm-path-finder
  
 ## Description
-This is a demo of path finding algorithm in Rust compiled to WebAssembly.
+This is a demo of pathfinding algorithm in Rust compiled to WebAssembly.
+The demo can be found [here](http://example.com).
+
+## How to build
+This project uses trunk to build and serve the web app. 
+You can install it with `cargo install --locked trunk`.
+Then you can run `trunk build --release` to build the project.
+The output will be placed in `dist/` directory.
 
 ## How to run
 Just run `trunk serve`.
