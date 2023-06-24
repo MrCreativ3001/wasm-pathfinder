@@ -51,7 +51,7 @@ impl Component for WebGL2GridComponent {
         if let WebGL2GridMsg::MouseEvent { event } = msg {
             let grid = &ctx.props().grid;
 
-            let new_pos = match Self::mouse_event_to_tile(&event, grid.rows(), grid.columns()) {
+            let new_pos = match Self::mouse_event_to_tile(&event, grid.width(), grid.height()) {
                 Some(pos) => pos,
                 None => return false,
             };
@@ -112,7 +112,7 @@ impl Component for WebGL2GridComponent {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let on_mouse_event = {
             let grid = &ctx.props().grid;
-            let (_grid_rows, _grid_columns) = (grid.rows(), grid.columns());
+            let (_grid_rows, _grid_columns) = (grid.height(), grid.width());
 
             let link = ctx.link().clone();
             Callback::from(move |event: MouseEvent| {
@@ -143,15 +143,15 @@ impl Component for WebGL2GridComponent {
 }
 
 impl WebGL2GridComponent {
-    fn tile_size(canvas_width: i32, canvas_height: i32, grid_rows: i32, grid_columns: i32) -> f32 {
+    fn tile_size(canvas_width: i32, canvas_height: i32, grid_width: i32, grid_height: i32) -> f32 {
         let canvas_shortest_side = canvas_width.min(canvas_height);
 
-        let grid_longest_side = grid_rows.max(grid_columns);
+        let grid_longest_side = grid_width.max(grid_height);
 
         canvas_shortest_side as f32 / grid_longest_side as f32
     }
 
-    fn mouse_event_to_tile(event: &MouseEvent, grid_rows: i32, grid_columns: i32) -> Option<Pos> {
+    fn mouse_event_to_tile(event: &MouseEvent, grid_width: i32, grid_height: i32) -> Option<Pos> {
         let canvas_element = event
             .target()
             .expect("Unable to get target")
@@ -162,8 +162,8 @@ impl WebGL2GridComponent {
         let tile_size = Self::tile_size(
             rect.width() as i32,
             rect.height() as i32,
-            grid_rows,
-            grid_columns,
+            grid_width,
+            grid_height,
         );
 
         let mouse_x = event.client_x() as f32 - rect.left() as f32;
@@ -172,7 +172,7 @@ impl WebGL2GridComponent {
         let tile_x = (mouse_x / tile_size) as i32;
         let tile_y = (mouse_y / tile_size) as i32;
 
-        if tile_x >= 0 && tile_x < grid_rows && tile_y >= 0 && tile_y < grid_columns {
+        if tile_x >= 0 && tile_x < grid_width && tile_y >= 0 && tile_y < grid_height {
             Some(Pos {
                 x: tile_x,
                 y: tile_y,
@@ -390,8 +390,8 @@ impl GlGridRenderer {
         self.tile_size = WebGL2GridComponent::tile_size(
             gl.drawing_buffer_width(),
             gl.drawing_buffer_height(),
-            grid.rows(),
-            grid.columns(),
+            grid.height(),
+            grid.width(),
         );
 
         self.state = Some(state);
@@ -421,8 +421,8 @@ impl GlGridRenderer {
         let start = grid.start();
         let end = grid.end();
 
-        for x in 0..grid.rows() {
-            for y in 0..grid.columns() {
+        for x in 0..grid.width() {
+            for y in 0..grid.height() {
                 let pos = Pos { x, y };
 
                 let tile = grid.tile(pos);

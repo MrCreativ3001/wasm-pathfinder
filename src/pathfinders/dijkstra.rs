@@ -17,8 +17,8 @@ impl PosPrioritizer for DijkstraPrioritizer {
         Self {
             grid_start: grid.start(),
             cached_distances_from_start: Vec2d::new(
-                grid.rows() as usize,
-                grid.columns() as usize,
+                grid.height() as usize,
+                grid.width() as usize,
                 None,
             ),
         }

@@ -3,7 +3,6 @@ use crate::pathfinders::{
     Grid, PathFindAlgorithm, PathFindAlgorithmConstructor, PathFindAlgorithmStepResult, Pos, Tile,
     Vec2d,
 };
-use std::borrow::Cow;
 use std::collections::VecDeque;
 
 pub trait PosPrioritizer {
@@ -41,7 +40,7 @@ where
 {
     fn make_state(grid: Grid) -> Self {
         let mut state = Self {
-            backtrace: Vec2d::new(grid.rows() as usize, grid.columns() as usize, None),
+            backtrace: Vec2d::new(grid.width() as usize, grid.height() as usize, None),
             queue: VecDeque::new(),
             prioritizer: P::new_prioritizer(&grid),
             grid,

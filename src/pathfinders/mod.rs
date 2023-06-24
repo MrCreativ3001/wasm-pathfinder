@@ -36,29 +36,29 @@ pub enum Tile {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Vec2d<T> {
-    rows: usize,
-    columns: usize,
+    width: usize,
+    height: usize,
     flattened: Vec<T>,
 }
 
 impl<T> Vec2d<T> {
-    pub fn new(rows: usize, columns: usize, value: T) -> Self
+    pub fn new(width: usize, height: usize, value: T) -> Self
     where
         T: Clone,
     {
-        let flattened = vec![value; rows * columns];
+        let flattened = vec![value; height * width];
         Self {
-            rows,
-            columns,
+            width,
+            height,
             flattened,
         }
     }
 
-    pub fn rows(&self) -> usize {
-        self.rows
+    pub fn width(&self) -> usize {
+        self.width
     }
-    pub fn columns(&self) -> usize {
-        self.columns
+    pub fn height(&self) -> usize {
+        self.height
     }
 
     pub fn get(&self, pos: Pos) -> Option<&T> {
@@ -84,10 +84,10 @@ impl<T> Vec2d<T> {
         }
         let x = pos.x as usize;
         let y = pos.y as usize;
-        if x >= self.rows || y >= self.columns {
+        if x >= self.width || y >= self.height {
             return None;
         }
-        Some(y * self.rows + x)
+        Some(y * self.width + x)
     }
 }
 
@@ -102,29 +102,25 @@ where
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Grid {
-    rows: Unit,
-    columns: Unit,
     tiles: Vec2d<Tile>,
     start: Pos,
     end: Pos,
 }
 
 impl Grid {
-    pub fn new(rows: Unit, columns: Unit, start: Pos, end: Pos) -> Self {
+    pub fn new(width: Unit, height: Unit, start: Pos, end: Pos) -> Self {
         Self {
-            rows,
-            columns,
-            tiles: Vec2d::new(rows as usize, columns as usize, Tile::None),
+            tiles: Vec2d::new(width as usize, height as usize, Tile::None),
             start,
             end,
         }
     }
 
-    pub fn rows(&self) -> Unit {
-        self.rows
+    pub fn width(&self) -> Unit {
+        self.tiles.width() as Unit
     }
-    pub fn columns(&self) -> Unit {
-        self.columns
+    pub fn height(&self) -> Unit {
+        self.tiles.height() as Unit
     }
 
     pub fn tile(&self, pos: Pos) -> Tile {

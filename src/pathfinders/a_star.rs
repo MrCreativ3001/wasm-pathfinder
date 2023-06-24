@@ -17,8 +17,8 @@ impl PosPrioritizer for AStarPrioritizer {
             grid_start: grid.start(),
             grid_end: grid.end(),
             cached_distances_from_start: Vec2d::new(
-                grid.rows() as usize,
-                grid.columns() as usize,
+                grid.height() as usize,
+                grid.width() as usize,
                 None,
             ),
         }

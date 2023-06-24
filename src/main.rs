@@ -9,8 +9,6 @@ use yew::prelude::*;
 mod pathfinders;
 mod ui;
 
-// TODO: Fix rows and cols sometimes being used wrong
-
 #[function_component]
 fn App() -> Html {
     let default_grid_options = GridOptions {
