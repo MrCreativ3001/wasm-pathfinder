@@ -1,7 +1,10 @@
-body {
+html, body {
     display: flex;
     flex-direction: row;
     gap: 20px;
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
 
 /* Options */
@@ -32,21 +35,16 @@ body {
 }
 .canvas-grid {
 }
-/* TODO: Fix */
 .dom-grid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-.grid-newline {
-    flex-basis: 100%;
-    height: 10px;
+    display: grid;
 }
 
 /* Tiles */
 .tile {
-    flex-grow: 1;
     border: 1px solid black;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 .tile-none {
     background-color: #34ceff;

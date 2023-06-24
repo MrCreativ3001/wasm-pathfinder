@@ -9,6 +9,8 @@ use yew::prelude::*;
 mod pathfinders;
 mod ui;
 
+// TODO: Fix rows and cols sometimes being used wrong
+
 #[function_component]
 fn App() -> Html {
     let default_grid_options = GridOptions {
@@ -99,9 +101,7 @@ fn App() -> Html {
                             path_finder_state_rc.replace_with(|_| None);
                         }
                         Err(_) => {
-                            if !cached_path.is_empty() {
-                                cached_path.set(Vec::with_capacity(0));
-                            }
+                            cached_path.set(Vec::with_capacity(0));
                             rerender.set(0);
                         }
                     };
@@ -133,20 +133,6 @@ fn App() -> Html {
             path_finder_state.replace_with(|_| None);
             grid.set(new_grid);
             cached_path.set(Vec::with_capacity(0));
-        })
-    };
-
-    let grid_component_visited = {
-        let path_finder_state = path_finder_state.clone();
-
-        Callback::from(move |pos| {
-            let path_finder_state_rc = path_finder_state.clone();
-            let path_finder_state_ref = path_finder_state_rc.borrow();
-            let path_finder_state = match path_finder_state_ref.as_ref() {
-                Some(state) => state,
-                None => return false,
-            };
-            path_finder_state.visited(pos)
         })
     };
 

@@ -62,8 +62,18 @@ impl Component for DOMGridComponent {
         let start = grid.start();
         let end = grid.end();
 
+        let style = {
+            format!(
+                "grid-template-rows: repeat({rows}, 1fr) {empty_rows}fr; grid-template-columns: repeat({columns}, 1fr) {empty_columns}fr;",
+                rows = grid.columns(),
+                empty_rows = (grid.rows() - grid.columns()).max(0),
+                columns = grid.rows(),
+                empty_columns = (grid.columns() - grid.rows()).max(0)
+            )
+        };
+
         html!(
-            <div class={classes!("grid", "dom-grid")}>
+            <div style={style} class={classes!("grid", "dom-grid")}>
                 {for gen_2d_iter(0..grid.columns(), 0..grid.rows()).map(|(y, x)| {
                     let pos = Pos { x, y };
                     let tile = grid.tile(pos);
@@ -71,7 +81,8 @@ impl Component for DOMGridComponent {
                     let is_tile_end = pos == end;
                     let is_tile_path = props.path.contains(&pos);
                     let is_visited = props.visited.contains(&pos);
-                    let is_new_line = x == 0;
+
+                    let is_line_end = pos.x == grid.rows() - 1;
 
                     let tile_on_tile_click = {
                         let on_tile_click = props.on_tile_click.clone();
@@ -115,17 +126,21 @@ impl Component for DOMGridComponent {
                     };
 
                     html!{
-                        <TileComponent
-                            tile={tile}
-                            is_start={is_tile_start}
-                            is_end={is_tile_end}
-                            is_path={is_tile_path}
-                            is_visited={is_visited}
-                            on_tile_click={tile_on_tile_click}
-                            on_tile_mouse_enter={on_tile_mouse_enter}
-                            tile_key={pos}
-                            is_new_line={is_new_line}
-                        />
+                        <>
+                            <TileComponent
+                                tile={tile}
+                                is_start={is_tile_start}
+                                is_end={is_tile_end}
+                                is_path={is_tile_path}
+                                is_visited={is_visited}
+                                on_tile_click={tile_on_tile_click}
+                                on_tile_mouse_enter={on_tile_mouse_enter}
+                                tile_key={pos}
+                            />
+                            if is_line_end {
+                                <div />
+                            }
+                        </>
                     }
                 }) }
             </div>
@@ -152,7 +167,6 @@ struct TileProps {
     pub on_tile_click: Callback<()>,
     pub on_tile_mouse_enter: Callback<bool>,
     pub tile_key: Pos,
-    pub is_new_line: bool,
 }
 #[function_component]
 fn TileComponent(props: &TileProps) -> Html {
@@ -198,11 +212,6 @@ fn TileComponent(props: &TileProps) -> Html {
     let prevent_drag = { Callback::from(move |e: DragEvent| e.prevent_default()) };
 
     html!(
-        <>
-            if props.is_new_line {
-                <div class={classes!("grid-newline")} />
-            }
-            <div class={tile_classes} key={format!("{}-{}", props.tile_key.x, props.tile_key.x)} onmousedown={on_mouse_down} onmouseenter={on_mouse_enter} ondragstart={prevent_drag} />
-        </>
+        <div class={tile_classes} key={format!("{}-{}", props.tile_key.x, props.tile_key.x)} onmousedown={on_mouse_down} onmouseenter={on_mouse_enter} ondragstart={prevent_drag} />
     )
 }
